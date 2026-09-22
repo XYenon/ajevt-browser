@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="en">
+<head><meta charset="utf-8"><title>Project Preview Console</title></head>
+<body>
+  <main>
+    <h1>Project Preview Console</h1>
+    <p>Create a local read-only preview. This demo does not send or persist data.</p>
+    <nav>
+      <a href="#docs">Documentation</a>
+      <a href="#history">History</a>
+      <button type="button" id="settings">Settings</button>
+    </nav>
+    <form id="preview-form">
+      <label>Project search <input name="project" type="search" placeholder="Project name"></label>
+      <button type="submit">Run safe preview</button>
+      <button type="button" id="clear">Clear</button>
+    </form>
+    <section id="results" aria-live="polite"></section>
+  </main>
+  <script>
+    const form = document.querySelector('#preview-form');
+    const input = form.elements.project;
+    const results = document.querySelector('#results');
+    form.addEventListener('submit', (event) => {
+      event.preventDefault();
+      const value = input.value.trim();
+      results.replaceChildren();
+      if (!value) return;
+      const link = document.createElement('a');
+      link.href = `#preview-${encodeURIComponent(value)}`;
+      link.textContent = `Preview ready for ${value}`;
+      results.append(link);
+    });
+    document.querySelector('#clear').addEventListener('click', () => {
+      input.value = '';
+      results.replaceChildren();
+    });
+  </script>
+</body>
+</html>

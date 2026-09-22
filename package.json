@@ -1,0 +1,75 @@
+{
+  "name": "ajevt-browser",
+  "version": "0.1.0",
+  "description": "A bounded Jev System-1 browser fast path for Pi, OpenCode V2, and MCP, powered exclusively by agent-browser",
+  "type": "module",
+  "exports": {
+    ".": "./index.ts",
+    "./pi": "./extensions/index.ts",
+    "./tui": "./tui.ts",
+    "./core": "./src/tool.ts",
+    "./format": "./src/format.ts",
+    "./schema": "./src/schema.ts",
+    "./types": "./src/types.ts"
+  },
+  "keywords": [
+    "pi-package",
+    "opencode-plugin",
+    "jev",
+    "agent-browser"
+  ],
+  "files": [
+    "extensions",
+    "src",
+    "index.ts",
+    "tui.ts"
+  ],
+  "scripts": {
+    "check": "biome check . && prettier --check README.md && markdownlint-cli2 README.md",
+    "check:fix": "biome check --write . && prettier --write README.md && markdownlint-cli2 README.md --fix",
+    "format": "biome format --write . && prettier --write README.md",
+    "format:check": "biome format . && prettier --check README.md",
+    "lint": "biome lint . && markdownlint-cli2 README.md",
+    "test": "tsx --test test/**/*.test.ts && pnpm --filter ajevt-browser-mcp test",
+    "typecheck": "tsc --noEmit && pnpm --filter ajevt-browser-mcp typecheck",
+    "smoke": "tsx scripts/smoke.ts",
+    "smoke:live": "tsx scripts/live-smoke.ts",
+    "smoke:complex": "tsx scripts/complex-smoke.ts"
+  },
+  "pi": {
+    "extensions": [
+      "./extensions/index.ts"
+    ]
+  },
+  "peerDependencies": {
+    "@earendil-works/pi-coding-agent": "*",
+    "@earendil-works/pi-tui": "*",
+    "typebox": "*"
+  },
+  "peerDependenciesMeta": {
+    "@earendil-works/pi-coding-agent": {
+      "optional": true
+    },
+    "@earendil-works/pi-tui": {
+      "optional": true
+    },
+    "typebox": {
+      "optional": true
+    }
+  },
+  "devDependencies": {
+    "@biomejs/biome": "^2.5.14",
+    "@earendil-works/pi-coding-agent": "^0.87.0",
+    "@earendil-works/pi-tui": "^0.87.0",
+    "@opencode/plugin": "^2.0.14",
+    "@types/node": "^24.13.6",
+    "markdownlint-cli2": "^0.23.3",
+    "prettier": "^3.9.8",
+    "tsx": "^4.23.15",
+    "typebox": "^1.3.34",
+    "typescript": "^7.0.2"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}

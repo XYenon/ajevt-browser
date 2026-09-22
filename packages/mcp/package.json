@@ -1,0 +1,31 @@
+{
+  "name": "ajevt-browser-mcp",
+  "version": "0.1.0",
+  "description": "stdio MCP server for ajevt-browser",
+  "type": "module",
+  "bin": {
+    "ajevt-browser-mcp": "./bin/ajevt-browser-mcp.js"
+  },
+  "files": [
+    "bin",
+    "src"
+  ],
+  "scripts": {
+    "start": "node bin/ajevt-browser-mcp.js",
+    "smoke": "tsx scripts/smoke.ts",
+    "test": "tsx --test test/**/*.test.ts",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.30.0",
+    "ajevt-browser": "workspace:*",
+    "tsx": "^4.23.15"
+  },
+  "devDependencies": {
+    "@types/node": "^24.13.6",
+    "typescript": "^7.0.2"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}

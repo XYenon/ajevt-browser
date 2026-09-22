@@ -1,0 +1,17 @@
+packages:
+  - "."
+  - "packages/*"
+
+allowBuilds:
+  '@google/genai': false
+  esbuild: true
+  msgpackr-extract: false
+  protobufjs: true
+minimumReleaseAgeExclude:
+  - '@earendil-works/pi-coding-agent@0.87.0'
+  - '@opencode/ai@2.0.14'
+  - '@opencode/client@2.0.14'
+  - '@opencode/plugin@2.0.14'
+  - '@opencode/protocol@2.0.14'
+  - '@opencode/schema@2.0.14'
+  - '@opencode/util@2.0.14'
