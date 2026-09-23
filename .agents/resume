@@ -1,0 +1,21 @@
+#!/usr/bin/env bash
+# Orb wake repair for ajevt-browser.
+#
+# Dependencies and the pnpm store stay on the orb disk, so nothing is installed
+# here. The agent-browser daemon and its Chrome process cannot survive a pause,
+# so re-check the browser build (a no-op when it is intact) to keep the first
+# tool call after a wake from failing on a missing browser.
+set -euo pipefail
+
+repo_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+cd "$repo_root"
+
+if [ ! -d node_modules/.pnpm ]; then
+  printf 'resume: node_modules is missing, run .agents/setup\n' >&2
+fi
+
+if command -v agent-browser >/dev/null 2>&1; then
+  agent-browser install >/dev/null
+else
+  printf 'resume: agent-browser is missing, run .agents/setup\n' >&2
+fi

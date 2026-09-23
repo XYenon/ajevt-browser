@@ -1,0 +1,34 @@
+#!/usr/bin/env bash
+# Orb setup for ajevt-browser.
+#
+# Installs the pnpm workspace dependencies and the agent-browser runtime so a
+# fresh orb can immediately run `pnpm test`, `pnpm typecheck`, `pnpm check`, and
+# the smoke scripts without reinstalling anything.
+#
+# Idempotent: a warm filesystem (snapshot restore) only re-verifies the install.
+set -euo pipefail
+
+repo_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+cd "$repo_root"
+
+started=$SECONDS
+step() { printf '\n==> %s (t+%ss)\n' "$1" "$((SECONDS - started))"; }
+
+step "node $(node --version), npm $(npm --version)"
+
+# Both CLIs ship with the orb template. Install them only if a template change
+# drops them; /usr/local is writable in orbs, so no sudo is needed.
+step "toolchain"
+command -v pnpm >/dev/null 2>&1 || npm install --global pnpm
+command -v agent-browser >/dev/null 2>&1 || npm install --global agent-browser
+printf 'pnpm %s, agent-browser %s\n' "$(pnpm --version)" "$(agent-browser --version)"
+
+step "pnpm install --frozen-lockfile"
+pnpm install --frozen-lockfile
+
+# Chrome for Testing lives in ~/.agent-browser/browsers and is part of the
+# snapshot; `install` is a no-op when the build matching the CLI is present.
+step "agent-browser install"
+agent-browser install
+
+step "ready: pnpm test | pnpm typecheck | pnpm check | pnpm smoke"
