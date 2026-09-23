@@ -10,7 +10,8 @@
     "./core": "./src/tool.ts",
     "./format": "./src/format.ts",
     "./schema": "./src/schema.ts",
-    "./types": "./src/types.ts"
+    "./types": "./src/types.ts",
+    "./amp": "./dist/ajevt-browser/index.js"
   },
   "keywords": [
     "pi-package",
@@ -21,10 +22,13 @@
   "files": [
     "extensions",
     "src",
+    "dist/ajevt-browser",
     "index.ts",
     "tui.ts"
   ],
   "scripts": {
+    "build:amp": "esbuild .amp/plugins/ajevt-browser/index.ts --bundle --platform=node --format=esm --target=es2023 --outfile=dist/ajevt-browser/index.js",
+    "prepack": "pnpm build:amp",
     "check": "biome check . && prettier --check README.md && markdownlint-cli2 README.md",
     "check:fix": "biome check --write . && prettier --write README.md && markdownlint-cli2 README.md --fix",
     "format": "biome format --write . && prettier --write README.md",
@@ -58,11 +62,13 @@
     }
   },
   "devDependencies": {
+    "@ampcode/plugin": "0.0.0-20260922001754-ga9ffbd3",
     "@biomejs/biome": "^2.5.14",
     "@earendil-works/pi-coding-agent": "^0.87.0",
     "@earendil-works/pi-tui": "^0.87.0",
     "@opencode/plugin": "^2.0.14",
     "@types/node": "^24.13.6",
+    "esbuild": "^0.28.2",
     "markdownlint-cli2": "^0.23.3",
     "prettier": "^3.9.8",
     "tsx": "^4.23.15",

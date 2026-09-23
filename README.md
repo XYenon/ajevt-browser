@@ -1,11 +1,11 @@
 # ajevt-browser
 
-A bounded Jev System-1 browser tool for Pi, OpenCode V2, and MCP. A single `ajevt_browser` call runs an observe/decide/validate/act loop using Vercel `agent-browser`.
+A bounded Jev System-1 browser tool for Pi, OpenCode V2, Amp, and MCP. A single `ajevt_browser` call runs an observe/decide/validate/act loop using Vercel `agent-browser`.
 
 ## Architecture
 
 ```text
-Pi extension (extensions/index.ts) / OpenCode V2 plugin (index.ts) / MCP server (packages/mcp)
+Pi extension (extensions/index.ts) / OpenCode V2 plugin (index.ts) / Amp plugin (.amp/plugins/ajevt-browser) / MCP server (packages/mcp)
   -> shared tool adapter (src/tool.ts)
   -> agent-browser adapter (session-scoped browser)
   -> snapshot -i observation + usefulness-ranked finite candidates
@@ -28,7 +28,7 @@ agent-browser install
 
 ## Configuration
 
-Pi, OpenCode, and MCP use the same strict JSON configuration file:
+Pi, OpenCode, Amp, and MCP use the same strict JSON configuration file:
 
 ```text
 $XDG_CONFIG_HOME/ajevt-browser/config.json
@@ -80,7 +80,7 @@ OpenCode `plugins[].options` can apply the highest-priority override using the s
 }
 ```
 
-Precedence is OpenCode options, environment variables, explicit/default user config, then defaults. Configuration is resolved for each tool call so file and secret rotation take effect without reloading the plugin.
+Precedence is OpenCode options (OpenCode only), environment variables, explicit/default user config, then defaults. Configuration is resolved for each tool call so file and secret rotation take effect without reloading the plugin.
 
 ## Loading
 
@@ -106,6 +106,24 @@ The package root exports the OpenCode V2 plugin, and the `pi.extensions` manifes
 Pi renders themed progress and compact result summaries. Expanded tool rows show actions, verification evidence, session details, and next steps.
 
 OpenCode loads the `./tui` export and presents concise tool results, structured handoff metadata, and lifecycle toasts.
+
+### Amp Plugin
+
+Amp discovers `.amp/plugins/ajevt-browser/index.ts` automatically when started in this checkout. This directory and its `index.ts` default export are the [official Amp plugin manifest/entry convention](https://ampcode.com/docs/customize/plugins); there is no separate plugin JSON manifest. The entry registers one agent-callable `ajevt_browser` tool using the shared schema, executor, and handoff formatter. Its text result includes a readable summary and the complete handoff JSON. Amp's tool API does not expose a cancellation signal or a separate structured-result field, unlike the MCP adapter.
+
+For this checkout, run `pnpm install`, install `agent-browser` as above, configure Jev as above, then run `amp` here (or reload plugins in an existing Amp session). Check discovery with `amp plugins list`. The plugin requires `agent-browser` on the **Amp executor's PATH** (or `AGENT_BROWSER_BIN`), a working browser installation, and Jev credentials in the **executor's** environment/config file. In an orb these are not automatically inherited from your local machine. Amp configuration settings are not used for secrets; the existing per-call configuration and secret-file checks apply unchanged. Configuration errors return an `Ajevt Browser error:` tool result instead of aborting plugin loading.
+
+To use it in another Amp project from a packaged checkout:
+
+```bash
+pnpm build:amp
+mkdir -p /path/to/project/.amp/plugins/ajevt-browser
+cp dist/ajevt-browser/index.js /path/to/project/.amp/plugins/ajevt-browser/index.js
+```
+
+`pnpm pack` runs `build:amp` automatically and includes `dist/ajevt-browser/index.js` in the tarball (`ajevt-browser/amp` package export). Copy that file from the unpacked package to the target project's `.amp/plugins/ajevt-browser/index.js`; it is bundled and has no project-relative source imports. Install and configure `agent-browser` and Jev in the target executor as above. Do not install it with `amp plugins add`: that command expects an Amp-hosted plugin URL, not an npm package or GitHub repository URL. The Amp plugin is a thin native tool adapter rather than an MCP subprocess or a skill, since the repository already has a shared executor and a single bounded operation; use the existing MCP server with other MCP clients.
+
+Ask Amp to call `ajevt_browser` with a bounded goal, starting URL and deterministic `verifiers`. Provide known field contents via `values`. `likely_done` is not proof; `needs_confirmation` means inspect the pending action and explicitly retry with `allow_risky: true` only when authorized. The tool can navigate and submit forms, so review the URL/domain scope and risk policy before use.
 
 ### MCP
 
@@ -182,6 +200,7 @@ pnpm format:check
 pnpm format
 pnpm test
 pnpm typecheck
+pnpm build:amp      # standalone Amp plugin bundle; pnpm pack runs this too
 pnpm smoke          # real, read-only agent-browser smoke test against example.com
 pnpm smoke:live     # read-only page test with a live Jev decision using JEV_* environment variables
 pnpm smoke:complex  # local form: live Jev TYPE → CLICK → deterministic completion proof

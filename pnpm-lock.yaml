@@ -8,6 +8,9 @@ importers:
 
   .:
     devDependencies:
+      '@ampcode/plugin':
+        specifier: 0.0.0-20260922001754-ga9ffbd3
+        version: 0.0.0-20260922001754-ga9ffbd3
       '@biomejs/biome':
         specifier: ^2.5.14
         version: 2.5.14
@@ -23,6 +26,9 @@ importers:
       '@types/node':
         specifier: ^24.13.6
         version: 24.13.6
+      esbuild:
+        specifier: ^0.28.2
+        version: 0.28.2
       markdownlint-cli2:
         specifier: ^0.23.3
         version: 0.23.3
@@ -63,6 +69,9 @@ packages:
   '@ai-sdk/provider@3.0.8':
     resolution: {integrity: sha512-oGMAgGoQdBXbZqNG0Ze56CHjDZ1IDYOwGYxYjO5KLSlz5HiNQ9udIXsPZ61VWaHGZ5XW/jyjmr6t2xz2jGVwbQ==}
     engines: {node: '>=18'}
+
+  '@ampcode/plugin@0.0.0-20260922001754-ga9ffbd3':
+    resolution: {integrity: sha512-BRo3e4j+8M1lb/Vn64pQc4rWMjAy+yakYYS4GnMsttlj2h49kd/B/tDlJ1JaOQ8g6YVWwtYg3DMno3TDihzVww==}
 
   '@anthropic-ai/sdk@0.124.0':
     resolution: {integrity: sha512-cN5O8i9UVxHeOQAzj/XjshWXG8KiibJDw9OGpH2Z/eR3n/RBxdoLxDJOcfqAJWvjaMDFfHTBADU04hWRJVkDyA==}
@@ -2380,6 +2389,8 @@ snapshots:
   '@ai-sdk/provider@3.0.8':
     dependencies:
       json-schema: 0.4.0
+
+  '@ampcode/plugin@0.0.0-20260922001754-ga9ffbd3': {}
 
   '@anthropic-ai/sdk@0.124.0(zod@4.1.8)':
     dependencies:
