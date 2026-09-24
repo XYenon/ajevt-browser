@@ -2,7 +2,17 @@
   "name": "ajevt-browser-mcp",
   "version": "0.1.0",
   "description": "stdio MCP server for ajevt-browser",
+  "license": "AGPL-3.0-only",
   "type": "module",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/XYenon/ajevt-browser.git",
+    "directory": "packages/mcp"
+  },
+  "homepage": "https://github.com/XYenon/ajevt-browser#mcp",
+  "bugs": {
+    "url": "https://github.com/XYenon/ajevt-browser/issues"
+  },
   "bin": {
     "ajevt-browser-mcp": "./bin/ajevt-browser-mcp.js"
   },

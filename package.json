@@ -2,7 +2,16 @@
   "name": "ajevt-browser",
   "version": "0.1.0",
   "description": "A bounded Jev System-1 browser fast path for Pi, OpenCode V2, and MCP, powered exclusively by agent-browser",
+  "license": "AGPL-3.0-only",
   "type": "module",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/XYenon/ajevt-browser.git"
+  },
+  "homepage": "https://github.com/XYenon/ajevt-browser#readme",
+  "bugs": {
+    "url": "https://github.com/XYenon/ajevt-browser/issues"
+  },
   "exports": {
     ".": "./index.ts",
     "./pi": "./extensions/index.ts",
@@ -29,11 +38,11 @@
   "scripts": {
     "build:amp": "esbuild .amp/plugins/ajevt-browser/index.ts --bundle --platform=node --format=esm --target=es2023 --outfile=dist/ajevt-browser/index.js",
     "prepack": "pnpm build:amp",
-    "check": "biome check . && prettier --check README.md && markdownlint-cli2 README.md",
-    "check:fix": "biome check --write . && prettier --write README.md && markdownlint-cli2 README.md --fix",
-    "format": "biome format --write . && prettier --write README.md",
-    "format:check": "biome format . && prettier --check README.md",
-    "lint": "biome lint . && markdownlint-cli2 README.md",
+    "check": "biome check . && prettier --check README.md packages/*/README.md && markdownlint-cli2 README.md packages/*/README.md",
+    "check:fix": "biome check --write . && prettier --write README.md packages/*/README.md && markdownlint-cli2 README.md packages/*/README.md --fix",
+    "format": "biome format --write . && prettier --write README.md packages/*/README.md",
+    "format:check": "biome format . && prettier --check README.md packages/*/README.md",
+    "lint": "biome lint . && markdownlint-cli2 README.md packages/*/README.md",
     "test": "tsx --test test/**/*.test.ts && pnpm --filter ajevt-browser-mcp test",
     "typecheck": "tsc --noEmit && pnpm --filter ajevt-browser-mcp typecheck",
     "smoke": "tsx scripts/smoke.ts",

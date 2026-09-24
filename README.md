@@ -1,5 +1,7 @@
 # ajevt-browser
 
+[![npm version](https://img.shields.io/npm/v/ajevt-browser.svg)](https://www.npmjs.com/package/ajevt-browser) [![ajevt-browser-mcp on npm](https://img.shields.io/npm/v/ajevt-browser-mcp.svg?label=ajevt-browser-mcp)](https://www.npmjs.com/package/ajevt-browser-mcp) [![license: AGPL-3.0-only](https://img.shields.io/badge/license-AGPL--3.0--only-blue.svg)](https://github.com/XYenon/ajevt-browser/blob/master/LICENSE) [![node](https://img.shields.io/node/v/ajevt-browser.svg)](https://github.com/XYenon/ajevt-browser/blob/master/package.json)
+
 A bounded Jev System-1 browser tool for Pi, OpenCode V2, Amp, and MCP. A single `ajevt_browser` call runs an observe/decide/validate/act loop using Vercel `agent-browser`.
 
 ## Architecture
@@ -18,13 +20,102 @@ Pi extension (extensions/index.ts) / OpenCode V2 plugin (index.ts) / Amp plugin 
 
 Jev selects from finite operations and compatible targets derived from the current page. TYPE values come from `values`; missing values return `input_required`. Password, token, and secret values are redacted from Jev requests, and a field that already holds the caller's value is not offered again, so a filled secret field is never retyped. The operation question states that PRESS Enter submits a filled form with no visible submit control, which keeps the model from stalling on search boxes that render no button.
 
-## Requirements
+## Install
+
+Install and provision the `agent-browser` runtime once, on the machine that runs the tool:
 
 ```bash
-pnpm install
-pnpm add -g agent-browser
+npm install -g agent-browser
 agent-browser install
 ```
+
+Then install the package for the host you use. Every host provides the same `ajevt_browser` tool, shares one executor, and reads the [configuration file](#configuration) below.
+
+### Pi
+
+```bash
+pi install npm:ajevt-browser
+pi -e npm:ajevt-browser   # try it without installing
+```
+
+### OpenCode V2
+
+Add the package to `opencode.jsonc`. The package root exports the plugin:
+
+```jsonc
+{
+  "$schema": "https://opencode.ai/config.json",
+  "plugins": ["ajevt-browser"],
+}
+```
+
+The package root exports the OpenCode V2 plugin, and the `pi.extensions` manifest registers `extensions/index.ts` with Pi. Both hosts provide the same `ajevt_browser` tool and shared execution behavior.
+
+Pi renders themed progress and compact result summaries. Expanded tool rows show actions, verification evidence, session details, and next steps.
+
+OpenCode loads the `./tui` export and presents concise tool results, structured handoff metadata, and lifecycle toasts.
+
+### Amp
+
+Install the plugin globally and link its bundled build into the [system plugin directory](https://ampcode.com/docs/customize/plugins):
+
+```bash
+npm install -g ajevt-browser
+mkdir -p ~/.config/amp/plugins/ajevt-browser
+ln -sf "$(npm root -g)/ajevt-browser/dist/ajevt-browser/index.js" ~/.config/amp/plugins/ajevt-browser/index.js
+```
+
+Use `$XDG_CONFIG_HOME/amp/plugins/ajevt-browser` when `XDG_CONFIG_HOME` is set. The symlink keeps the plugin on whatever version is installed globally, so `npm install -g ajevt-browser@latest` updates it. `amp plugins add` does not work here: it only accepts Amp-hosted plugin URLs. Confirm discovery with `amp plugins list`, and reload plugins in a running Amp session.
+
+The plugin needs `agent-browser` on the Amp executor's PATH (or `AGENT_BROWSER_BIN`) and Jev credentials in that executor's environment or config file, which an orb does not inherit from your machine. Configuration errors return an `Ajevt Browser error:` tool result instead of failing plugin loading.
+
+Ask Amp to call `ajevt_browser` with a bounded goal, a starting URL, deterministic `verifiers`, and known field contents in `values`.
+
+### MCP
+
+The `ajevt-browser-mcp` package provides a stdio MCP server and includes the MCP SDK runtime. Run the published server with `npx`:
+
+```bash
+npx -y ajevt-browser-mcp
+```
+
+An MCP client configuration:
+
+```json
+{
+  "mcpServers": {
+    "ajevt-browser": {
+      "command": "npx",
+      "args": ["-y", "ajevt-browser-mcp"]
+    }
+  }
+}
+```
+
+MCP calls return a concise text summary and the complete handoff in `structuredContent`. The server supports cancellation and progress notifications.
+
+Example tool input:
+
+```json
+{
+  "goal": "Enter the supplied query and stop when the results page visibly contains Example Domain",
+  "url": "https://example.test/search",
+  "values": { "Search": "Example Domain" },
+  "max_steps": 8,
+  "allow_risky": false,
+  "allowed_domains": ["example.test"],
+  "proxy_bypass": ["example.test"],
+  "host_mappings": { "example.test": "127.0.0.1" },
+  "ignore_https_errors": false,
+  "keep_session": true,
+  "require_action": true,
+  "verifiers": [{ "type": "text_contains", "text": "Example Domain" }]
+}
+```
+
+Values can be keyed by `@ref`, exact field name, normalized lowercase name, or `role:name`. A key that only partly matches a field name (`Search` for `Search Wikipedia`) also binds, but only when exactly one typable field matches it; otherwise the call returns `input_required`. For dynamic pages where refs change after rerenders, prefer the `element_value_equals` verifier with a stable role/name match over ref-based `value_equals`.
+
+Text verifiers read both the accessibility snapshot and the rendered page text, so `text_contains` matches prose such as a confirmation message that never appears in an interactive-only snapshot. Native `<select>` dropdowns are observed as option lists on their combobox, so they are driven with the `SELECT` operation instead of a click on an unclickable option.
 
 ## Configuration
 
@@ -67,13 +158,13 @@ export JEV_TIMEOUT_MS='2000' # timeout for each attempt
 export JEV_RETRIES='5'       # retries after the first attempt; range 0-5
 ```
 
-OpenCode `plugins[].options` can apply the highest-priority override using the same document shape:
+OpenCode `plugins[].options` can apply the highest-priority override using the same document shape. The `package` entry takes an npm name or a local path:
 
 ```jsonc
 {
   "plugins": [
     {
-      "package": "/absolute/path/to/ajevt-browser",
+      "package": "ajevt-browser",
       "options": { "decision": { "model": "jev-latest", "timeoutMs": 3000 } },
     },
   ],
@@ -81,103 +172,6 @@ OpenCode `plugins[].options` can apply the highest-priority override using the s
 ```
 
 Precedence is OpenCode options (OpenCode only), environment variables, explicit/default user config, then defaults. Configuration is resolved for each tool call so file and secret rotation take effect without reloading the plugin.
-
-## Loading
-
-Load into Pi:
-
-```bash
-pi -e .
-# or
-pi install /absolute/path/to/ajevt-browser
-```
-
-Load into OpenCode V2 from this checkout by adding the package directory to `opencode.jsonc`:
-
-```jsonc
-{
-  "$schema": "https://opencode.ai/config.json",
-  "plugins": ["/absolute/path/to/ajevt-browser"],
-}
-```
-
-The package root exports the OpenCode V2 plugin, and the `pi.extensions` manifest registers `extensions/index.ts` with Pi. Both hosts provide the same `ajevt_browser` tool and shared execution behavior.
-
-Pi renders themed progress and compact result summaries. Expanded tool rows show actions, verification evidence, session details, and next steps.
-
-OpenCode loads the `./tui` export and presents concise tool results, structured handoff metadata, and lifecycle toasts.
-
-### Amp Plugin
-
-Amp discovers `.amp/plugins/ajevt-browser/index.ts` automatically when started in this checkout. This directory and its `index.ts` default export are the [official Amp plugin manifest/entry convention](https://ampcode.com/docs/customize/plugins); there is no separate plugin JSON manifest. The entry registers one agent-callable `ajevt_browser` tool using the shared schema, executor, and handoff formatter. Its text result includes a readable summary and the complete handoff JSON. Amp's tool API does not expose a cancellation signal or a separate structured-result field, unlike the MCP adapter.
-
-For this checkout, run `pnpm install`, install `agent-browser` as above, configure Jev as above, then run `amp` here (or reload plugins in an existing Amp session). Check discovery with `amp plugins list`. The plugin requires `agent-browser` on the **Amp executor's PATH** (or `AGENT_BROWSER_BIN`), a working browser installation, and Jev credentials in the **executor's** environment/config file. In an orb these are not automatically inherited from your local machine. Amp configuration settings are not used for secrets; the existing per-call configuration and secret-file checks apply unchanged. Configuration errors return an `Ajevt Browser error:` tool result instead of aborting plugin loading.
-
-To use it in another Amp project from a packaged checkout:
-
-```bash
-pnpm build:amp
-mkdir -p /path/to/project/.amp/plugins/ajevt-browser
-cp dist/ajevt-browser/index.js /path/to/project/.amp/plugins/ajevt-browser/index.js
-```
-
-`pnpm pack` runs `build:amp` automatically and includes `dist/ajevt-browser/index.js` in the tarball (`ajevt-browser/amp` package export). Copy that file from the unpacked package to the target project's `.amp/plugins/ajevt-browser/index.js`; it is bundled and has no project-relative source imports. Install and configure `agent-browser` and Jev in the target executor as above. Do not install it with `amp plugins add`: that command expects an Amp-hosted plugin URL, not an npm package or GitHub repository URL. The Amp plugin is a thin native tool adapter rather than an MCP subprocess or a skill, since the repository already has a shared executor and a single bounded operation; use the existing MCP server with other MCP clients.
-
-Ask Amp to call `ajevt_browser` with a bounded goal, starting URL and deterministic `verifiers`. Provide known field contents via `values`. `likely_done` is not proof; `needs_confirmation` means inspect the pending action and explicitly retry with `allow_risky: true` only when authorized. The tool can navigate and submit forms, so review the URL/domain scope and risk policy before use.
-
-### MCP
-
-The `ajevt-browser-mcp` package provides a stdio MCP server and includes the MCP SDK runtime.
-
-Run it from this checkout with:
-
-```bash
-pnpm --filter ajevt-browser-mcp start
-```
-
-For an MCP client configuration that launches this checkout directly:
-
-```json
-{
-  "mcpServers": {
-    "ajevt-browser": {
-      "command": "pnpm",
-      "args": [
-        "--dir",
-        "/absolute/path/to/ajevt-browser",
-        "--filter",
-        "ajevt-browser-mcp",
-        "start"
-      ]
-    }
-  }
-}
-```
-
-MCP calls return a concise text summary and the complete handoff in `structuredContent`. The server supports cancellation and progress notifications.
-
-Example tool input:
-
-```json
-{
-  "goal": "Enter the supplied query and stop when the results page visibly contains Example Domain",
-  "url": "https://example.test/search",
-  "values": { "Search": "Example Domain" },
-  "max_steps": 8,
-  "allow_risky": false,
-  "allowed_domains": ["example.test"],
-  "proxy_bypass": ["example.test"],
-  "host_mappings": { "example.test": "127.0.0.1" },
-  "ignore_https_errors": false,
-  "keep_session": true,
-  "require_action": true,
-  "verifiers": [{ "type": "text_contains", "text": "Example Domain" }]
-}
-```
-
-Values can be keyed by `@ref`, exact field name, normalized lowercase name, or `role:name`. A key that only partly matches a field name (`Search` for `Search Wikipedia`) also binds, but only when exactly one typable field matches it; otherwise the call returns `input_required`. For dynamic pages where refs change after rerenders, prefer the `element_value_equals` verifier with a stable role/name match over ref-based `value_equals`.
-
-Text verifiers read both the accessibility snapshot and the rendered page text, so `text_contains` matches prose such as a confirmation message that never appears in an interactive-only snapshot. Native `<select>` dropdowns are observed as option lists on their combobox, so they are driven with the `SELECT` operation instead of a click on an unclickable option.
 
 ## Safety and completion
 
@@ -193,7 +187,24 @@ Text verifiers read both the accessibility snapshot and the rendered page text, 
 - Development and tunneled environments can use `ignore_https_errors`, `ca_cert`, `proxy`, `proxy_bypass`, and structured `host_mappings`.
 - Handoffs are one of: `done`, `likely_done`, `input_required`, `ambiguous`, `needs_confirmation`, `blocked`, `stuck`, `error`.
 
-## Development checks
+## Development
+
+Clone the repository and install the workspace dependencies:
+
+```bash
+git clone https://github.com/XYenon/ajevt-browser
+cd ajevt-browser
+pnpm install
+```
+
+The checkout runs the same code as the published packages and each host can load it directly:
+
+- **Pi**: `pi -e .`, or `pi install /absolute/path/to/ajevt-browser`
+- **OpenCode V2**: use the checkout path in `opencode.jsonc`, `"plugins": ["/absolute/path/to/ajevt-browser"]`
+- **Amp**: Amp loads `.amp/plugins/ajevt-browser/index.ts` when started in the checkout, so no install is needed; `pnpm build:amp` writes the bundle the published package ships to `dist/ajevt-browser/index.js`
+- **MCP**: `pnpm --filter ajevt-browser-mcp start`, or point a client at the checkout with `pnpm --dir /absolute/path/to/ajevt-browser --filter ajevt-browser-mcp start`
+
+### Checks
 
 ```bash
 pnpm check          # lint, formatting, and import organization
@@ -211,3 +222,17 @@ pnpm smoke:sites    # broad live check against common websites (search, links, f
 ```
 
 The suite covers malformed probabilities, low confidence, stale state, repeated actions, missing input, secret redaction, confirmation policy, custom endpoints, and a complete fake-browser/fake-Jev offline loop.
+
+### Publishing
+
+Both packages ship from this workspace. Commit your changes first, because pnpm refuses to publish from a dirty working tree, then publish in dependency order:
+
+```bash
+pnpm -r publish
+```
+
+`pnpm --recursive` walks the workspace topologically, so `ajevt-browser` is published before `ajevt-browser-mcp`, and the `workspace:*` range in the MCP package is rewritten to the published version. The root package's `prepack` builds `dist/ajevt-browser/index.js` (the bundled Amp plugin) before packing, so it is always in the tarball. Both packages are unscoped and public.
+
+## License
+
+[AGPL-3.0-only](https://github.com/XYenon/ajevt-browser/blob/master/LICENSE)
