@@ -1,6 +1,14 @@
 import type { Observation, Verifier } from "./types.js";
 
+// Text verifiers accept either the accessibility tree or the rendered page
+// text: the tree names controls, the rendered text carries prose such as a
+// confirmation message that never appears in an interactive-only snapshot.
+function readableText(observation: Observation): string {
+  return observation.pageText ? `${observation.text}\n${observation.pageText}` : observation.text;
+}
+
 export function verify(observation: Observation, verifiers: Verifier[] = []) {
+  const text = readableText(observation).toLowerCase();
   const checks = verifiers.map((check) => {
     let passed = false;
     let detail = "";
@@ -19,11 +27,11 @@ export function verify(observation: Observation, verifiers: Verifier[] = []) {
         break;
       }
       case "text_contains":
-        passed = observation.text.toLowerCase().includes(check.text.toLowerCase());
+        passed = text.includes(check.text.toLowerCase());
         detail = `page text contains ${JSON.stringify(check.text)}`;
         break;
       case "text_absent":
-        passed = !observation.text.toLowerCase().includes(check.text.toLowerCase());
+        passed = !text.includes(check.text.toLowerCase());
         detail = `page text omits ${JSON.stringify(check.text)}`;
         break;
       case "element_exists":

@@ -81,6 +81,63 @@ test("stale page is re-observed and never executes the stale ref", async () => {
   assert.equal(result.status, "likely_done");
 });
 
+test("a lazy-loading page still executes once the chosen target survives", async () => {
+  const target = { ref: "@e1", role: "button", name: "Continue" };
+  const browser = new FakeBrowser([
+    observation({ fingerprint: "a", elements: [target] }),
+    observation({ fingerprint: "b", elements: [target] }),
+    observation({ fingerprint: "c", elements: [target] }),
+    observation({ fingerprint: "d", elements: [target] }),
+    observation({ fingerprint: "e", elements: [target], text: "Complete" }),
+  ]);
+  const jev = new FakeJev((request) => responseFor(request, "CLICK"));
+  const result = await runBrowserLoop(browser, jev, {
+    goal: "continue",
+    url: "https://example.test",
+    maxSteps: 3,
+  });
+  assert.equal(browser.actions.length, 1);
+  assert.match(result.reason, /Maximum step budget/);
+});
+
+test("a decision whose target disappears is never executed", async () => {
+  const browser = new FakeBrowser([
+    observation({ fingerprint: "a", elements: [{ ref: "@e1", role: "button", name: "Continue" }] }),
+    observation({ fingerprint: "b", elements: [{ ref: "@e2", role: "button", name: "Other" }] }),
+    observation({ fingerprint: "c", elements: [{ ref: "@e3", role: "button", name: "Other" }] }),
+    observation({ fingerprint: "d", elements: [{ ref: "@e4", role: "button", name: "Other" }] }),
+  ]);
+  const jev = new FakeJev((request) => responseFor(request, "CLICK"));
+  const result = await runBrowserLoop(browser, jev, {
+    goal: "continue",
+    url: "https://example.test",
+    maxSteps: 3,
+  });
+  assert.equal(browser.actions.length, 0);
+  assert.match(result.reason, /Maximum step budget/);
+});
+
+test("a covered click is recorded in history and does not abort the run", async () => {
+  const page = observation({ elements: [{ ref: "@e1", role: "button", name: "Continue" }] });
+  const browser = new FakeBrowser([page, page, page, page]);
+  browser.failures.set("@e1", new Error("Element '@e1' is covered by a banner at its click point"));
+  const jev = new FakeJev((request) => responseFor(request, "CLICK"));
+  const result = await runBrowserLoop(browser, jev, { goal: "continue", url: page.url, maxSteps: 2 });
+  assert.equal(result.status, "stuck");
+  assert.equal(browser.actions.length, 0);
+  assert.match(result.recent_actions[0]?.error ?? "", /covered by a banner/);
+});
+
+test("a browser command failure still ends the run with an error", async () => {
+  const page = observation({ elements: [{ ref: "@e1", role: "button", name: "Continue" }] });
+  const browser = new FakeBrowser([page, page]);
+  browser.failures.set("@e1", Object.assign(new Error("agent-browser command timed out"), { code: "TIMEOUT" }));
+  const jev = new FakeJev((request) => responseFor(request, "CLICK"));
+  const result = await runBrowserLoop(browser, jev, { goal: "continue", url: page.url, maxSteps: 2 });
+  assert.equal(result.status, "error");
+  assert.match(result.reason, /timed out/);
+});
+
 test("repeated action stops with bounded recovery", async () => {
   const same = observation();
   const browser = new FakeBrowser(Array(10).fill(same));
@@ -286,6 +343,20 @@ test("an initial cross-origin redirect requires confirmation before verification
     verifiers: [{ type: "text_contains", text: "Success" }],
   });
   assert.equal(result.status, "needs_confirmation");
+  assert.equal(jev.calls.length, 0);
+});
+
+test("a page that ends up on about:blank reports the new-tab cause", async () => {
+  const blank = observation({ url: "about:blank", text: "", elements: [] });
+  const browser = new FakeBrowser([blank]);
+  const jev = new FakeJev((request) => responseFor(request, "CLICK"));
+  const result = await runBrowserLoop(browser, jev, {
+    goal: "open the new window",
+    url: "https://example.test/windows",
+    allowedDomains: ["example.test"],
+  });
+  assert.equal(result.status, "blocked");
+  assert.match(result.reason, /opens a new tab that cannot inherit the domain allowlist/);
   assert.equal(jev.calls.length, 0);
 });
 

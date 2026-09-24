@@ -71,7 +71,7 @@ export const ajevtBrowserJsonSchema = {
       type: "object",
       additionalProperties: { type: "string" },
       description:
-        "Caller-provided logical values keyed by ref, field name, normalized name, or role:name. Secrets remain local and are never sent to Jev.",
+        "Caller-provided logical values keyed by ref, field name, normalized name, or role:name. A key that only partly matches a field name also binds when exactly one typable field matches. Secrets remain local and are never sent to Jev.",
     },
     max_steps: { type: "integer", minimum: 1, maximum: 50, description: "Bounded action budget (default 12)." },
     allow_risky: { type: "boolean", description: "Allow destructive/commitment actions after policy detection." },

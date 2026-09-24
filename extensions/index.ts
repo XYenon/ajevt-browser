@@ -108,7 +108,7 @@ export default function (pi: ExtensionAPI) {
       values: Type.Optional(
         Type.Record(Type.String(), Type.String(), {
           description:
-            "Caller-provided logical values keyed by ref, field name, normalized name, or role:name. Secrets remain local and are never sent to Jev.",
+            "Caller-provided logical values keyed by ref, field name, normalized name, or role:name. A key that only partly matches a field name also binds when exactly one typable field matches. Secrets remain local and are never sent to Jev.",
         }),
       ),
       max_steps: Type.Optional(

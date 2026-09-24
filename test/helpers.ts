@@ -50,6 +50,7 @@ export class FakeBrowser implements BrowserAdapter {
   actions: Candidate[] = [];
   closed = false;
   observations: Observation[];
+  failures = new Map<string, Error>();
   private index = 0;
   constructor(observations: Observation[]) {
     this.observations = observations;
@@ -59,6 +60,9 @@ export class FakeBrowser implements BrowserAdapter {
     return this.observations[Math.min(this.index++, this.observations.length - 1)];
   }
   async execute(candidate: Candidate): Promise<void> {
+    const failure =
+      (candidate.ref ? this.failures.get(candidate.ref) : undefined) ?? this.failures.get(candidate.operation);
+    if (failure) throw failure;
     this.actions.push(candidate);
   }
   async close(): Promise<void> {
@@ -71,6 +75,7 @@ export function observation(overrides: Partial<Observation> = {}): Observation {
     url: "https://example.test/",
     title: "Test",
     text: "Form",
+    pageText: "",
     elements: [{ ref: "@e1", role: "button", name: "Continue" }],
     fingerprint: "a",
     ...overrides,

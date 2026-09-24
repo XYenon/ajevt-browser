@@ -38,7 +38,8 @@
     "typecheck": "tsc --noEmit && pnpm --filter ajevt-browser-mcp typecheck",
     "smoke": "tsx scripts/smoke.ts",
     "smoke:live": "tsx scripts/live-smoke.ts",
-    "smoke:complex": "tsx scripts/complex-smoke.ts"
+    "smoke:complex": "tsx scripts/complex-smoke.ts",
+    "smoke:sites": "tsx scripts/sites-smoke.ts"
   },
   "pi": {
     "extensions": [

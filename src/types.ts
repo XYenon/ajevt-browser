@@ -14,6 +14,9 @@ export interface BrowserElement {
   role: string;
   name: string;
   value?: string;
+  // Whether the field currently holds a value. Recorded before redaction so a
+  // filled secret field is still recognizable as filled.
+  filled?: boolean;
   checked?: boolean;
   selected?: boolean;
   disabled?: boolean;
@@ -24,6 +27,7 @@ export interface Observation {
   url: string;
   title: string;
   text: string;
+  pageText: string;
   elements: BrowserElement[];
   fingerprint: string;
 }
@@ -87,6 +91,7 @@ export interface HistoryEntry {
   confidence: number;
   changed: boolean;
   url: string;
+  error?: string;
 }
 
 export interface Handoff {

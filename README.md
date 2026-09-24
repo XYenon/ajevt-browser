@@ -8,7 +8,7 @@ A bounded Jev System-1 browser tool for Pi, OpenCode V2, Amp, and MCP. A single 
 Pi extension (extensions/index.ts) / OpenCode V2 plugin (index.ts) / Amp plugin (.amp/plugins/ajevt-browser) / MCP server (packages/mcp)
   -> shared tool adapter (src/tool.ts)
   -> agent-browser adapter (session-scoped browser)
-  -> snapshot -i observation + usefulness-ranked finite candidates
+  -> snapshot -i + rendered page text observation + usefulness-ranked finite candidates
   -> one System One request/step (operation + speculative target heads + done/stuck/risky)
   -> strict probability/confidence/risk validation
   -> fresh snapshot guard
@@ -16,7 +16,7 @@ Pi extension (extensions/index.ts) / OpenCode V2 plugin (index.ts) / Amp plugin 
   -> deterministic verifier or compact structured handoff
 ```
 
-Jev selects from finite operations and compatible targets derived from the current page. TYPE values come from `values`; missing values return `input_required`. Password, token, and secret values are redacted from Jev requests.
+Jev selects from finite operations and compatible targets derived from the current page. TYPE values come from `values`; missing values return `input_required`. Password, token, and secret values are redacted from Jev requests, and a field that already holds the caller's value is not offered again, so a filled secret field is never retyped. The operation question states that PRESS Enter submits a filled form with no visible submit control, which keeps the model from stalling on search boxes that render no button.
 
 ## Requirements
 
@@ -175,12 +175,15 @@ Example tool input:
 }
 ```
 
-Values can be keyed by `@ref`, exact field name, normalized lowercase name, or `role:name`. For dynamic pages where refs change after rerenders, prefer the `element_value_equals` verifier with a stable role/name match over ref-based `value_equals`.
+Values can be keyed by `@ref`, exact field name, normalized lowercase name, or `role:name`. A key that only partly matches a field name (`Search` for `Search Wikipedia`) also binds, but only when exactly one typable field matches it; otherwise the call returns `input_required`. For dynamic pages where refs change after rerenders, prefer the `element_value_equals` verifier with a stable role/name match over ref-based `value_equals`.
+
+Text verifiers read both the accessibility snapshot and the rendered page text, so `text_contains` matches prose such as a confirmation message that never appears in an interactive-only snapshot. Native `<select>` dropdowns are observed as option lists on their combobox, so they are driven with the `SELECT` operation instead of a click on an unclickable option.
 
 ## Safety and completion
 
 - A second snapshot immediately before execution invalidates stale decisions.
-- `allowed_domains` authorizes cross-origin navigation; boundary checks run before completion verification, and the allowlist is also passed to agent-browser.
+- `allowed_domains` authorizes cross-origin navigation; boundary checks run before completion verification. Each entry covers its own host and its subdomains, with or without a `*.` prefix. The list is also passed to agent-browser's browser-level containment, but only when the caller supplies one, because that containment breaks sites that detect it (Bing leaves the page for `about:blank`). Without `allowed_domains` the loop still refuses cross-origin navigation.
+- A link that opens its own tab cannot inherit that containment: the action fails or the session lands on `about:blank`, and the handoff reports that cause instead of a bare timeout. Retry without `allowed_domains` or choose a link that stays in the same tab.
 - Destructive or commitment actions return `needs_confirmation`; `allow_risky: true` authorizes execution.
 - Repeated actions and no-progress runs have small fixed budgets.
 - `DONE` or high `goal_completed` returns `done` with passing verifiers and `likely_done` otherwise.
@@ -204,6 +207,7 @@ pnpm build:amp      # standalone Amp plugin bundle; pnpm pack runs this too
 pnpm smoke          # real, read-only agent-browser smoke test against example.com
 pnpm smoke:live     # read-only page test with a live Jev decision using JEV_* environment variables
 pnpm smoke:complex  # local form: live Jev TYPE → CLICK → deterministic completion proof
+pnpm smoke:sites    # broad live check against common websites (search, links, forms, dropdowns, login, async content, commitments, domain boundary)
 ```
 
 The suite covers malformed probabilities, low confidence, stale state, repeated actions, missing input, secret redaction, confirmation policy, custom endpoints, and a complete fake-browser/fake-Jev offline loop.

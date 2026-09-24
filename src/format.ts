@@ -17,7 +17,8 @@ function percent(value: number): string {
 
 function actionLine(action: HistoryEntry, index: number): string {
   const target = action.label || action.target || "page";
-  return `  ${index + 1}. ${action.operation.padEnd(6)} ${target} · ${percent(action.confidence)}`;
+  const outcome = action.error ? ` · failed: ${action.error.slice(0, 120)}` : "";
+  return `  ${index + 1}. ${action.operation.padEnd(6)} ${target} · ${percent(action.confidence)}${outcome}`;
 }
 
 export function formatHandoff(result: Handoff): string {
