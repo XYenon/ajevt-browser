@@ -1,5 +1,13 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
   "extends": ["config:recommended", "group:allNonMajor", ":automergeStableNonMajor", ":configMigration"],
-  "minimumReleaseAge": "1 day"
+  "minimumReleaseAge": "1 day",
+  "packageRules": [
+    {
+      "description": "Automerge non-major updates for Amp and Pi packages, which are still 0.x",
+      "matchPackageNames": ["@ampcode/plugin", "@earendil-works/**"],
+      "matchUpdateTypes": ["minor", "patch"],
+      "automerge": true
+    }
+  ]
 }
