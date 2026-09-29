@@ -1,6 +1,6 @@
 import { decide } from "./decision.js";
 import { matchesAllowedDomain } from "./domains.js";
-import { buildCandidates, compactObservation } from "./observation.js";
+import { buildCandidates, type CandidateSpace, compactObservation } from "./observation.js";
 import { requestsActionOnLabel } from "./policy.js";
 import type {
   BrowserAdapter,
@@ -11,6 +11,7 @@ import type {
   HistoryEntry,
   JevTransport,
   Observation,
+  Operation,
   Verifier,
 } from "./types.js";
 import { verify } from "./verifier.js";
@@ -112,9 +113,23 @@ function browserSession(options: RunOptions): string | undefined {
 }
 
 function signature(candidate: Candidate): string {
-  return [candidate.operation, candidate.ref ?? "", candidate.option ?? candidate.key ?? candidate.valueKey ?? ""].join(
-    "|",
-  );
+  return [
+    candidate.operation,
+    candidate.ref ?? "",
+    candidate.option ?? candidate.key ?? candidate.direction ?? candidate.valueKey ?? "",
+  ].join("|");
+}
+
+function withoutExcluded(space: CandidateSpace, excluded: Set<string>): CandidateSpace {
+  if (!excluded.size) return space;
+  const all = space.all.filter((candidate) => !excluded.has(signature(candidate)));
+  const byOperation = new Map<Operation, Candidate[]>();
+  for (const candidate of all) {
+    const pool = byOperation.get(candidate.operation) ?? [];
+    pool.push(candidate);
+    byOperation.set(candidate.operation, pool);
+  }
+  return { all, byOperation };
 }
 
 // Command-level failures (timeout, abort, oversized output) mean the browser
@@ -153,6 +168,21 @@ export async function runBrowserLoop(
   let sameAction = 0;
   let previousSignature = "";
   let noProgress = 0;
+  let recovery: { reason: string; avoid_previous_signature: string; instruction: string } | undefined;
+  const excluded = new Set<string>();
+  let excludedFingerprint = "";
+  const recover = (candidate: Candidate, reason: string, exclude: boolean) => {
+    const sig = signature(candidate);
+    recovery = {
+      reason,
+      avoid_previous_signature: sig,
+      instruction: `The previous action (${sig}) ${reason}. Avoid that signature and choose a different strategy from the offered candidates; do not claim completion without evidence.`,
+    };
+    if (exclude) {
+      excludedFingerprint = observation.fingerprint;
+      excluded.add(sig);
+    }
+  };
   let staleReobserves = 0;
   const staleReobserveLimit = 2;
   const hasValues = Object.keys(values).length > 0;
@@ -251,6 +281,13 @@ export async function runBrowserLoop(
 
     for (let step = 1; step <= maxSteps; step++) {
       if (options.signal?.aborted) throw options.signal.reason ?? new Error("aborted");
+      if (excludedFingerprint && observation.fingerprint !== excludedFingerprint) {
+        excluded.clear();
+        excludedFingerprint = "";
+        recovery = undefined;
+        sameAction = 0;
+        previousSignature = "";
+      }
       boundary = navigationBoundary(observation, options, initialOrigin);
       if (boundary) return handoff(boundary.status, options, observation, history, {}, boundary.reason);
       // Caller-authored deterministic checks can prove an already-satisfied
@@ -267,7 +304,7 @@ export async function runBrowserLoop(
           });
       }
 
-      const space = buildCandidates(observation, options.goal, values);
+      const space = withoutExcluded(buildCandidates(observation, options.goal, values), excluded);
       const boundTypeCandidate = space.byOperation
         .get("TYPE")
         ?.find(
@@ -295,6 +332,8 @@ export async function runBrowserLoop(
             error: error instanceof Error ? error.message : String(error),
           });
           while (history.length > (options.historyLimit ?? 6)) history.shift();
+          recover(boundTypeCandidate, "failed on this page", true);
+          observation = await browser.observe(options.signal);
           await options.onProgress?.({
             step,
             phase: "action-failed",
@@ -352,6 +391,7 @@ export async function runBrowserLoop(
           history.slice(-(options.historyLimit ?? 6)),
           options.model ?? "jev-latest",
           options.signal,
+          recovery,
         );
       } catch (error) {
         return handoff(
@@ -448,15 +488,10 @@ export async function runBrowserLoop(
       } else {
         sameAction = sig === previousSignature ? sameAction + 1 : 1;
         previousSignature = sig;
-        if (sameAction > repeatLimit)
-          return handoff(
-            "stuck",
-            options,
-            observation,
-            history,
-            decision,
-            "Repeated-action recovery budget exhausted.",
-          );
+        if (sameAction > repeatLimit) {
+          recover(candidate, "was repeated without progress", true);
+          continue;
+        }
       }
 
       try {
@@ -476,6 +511,8 @@ export async function runBrowserLoop(
           error: message,
         });
         while (history.length > (options.historyLimit ?? 6)) history.shift();
+        recover(candidate, `failed: ${message}`, true);
+        observation = await browser.observe(options.signal);
         noProgress += 1;
         await options.onProgress?.({
           step,
@@ -509,6 +546,13 @@ export async function runBrowserLoop(
       while (history.length > (options.historyLimit ?? 6)) history.shift();
       await options.onProgress?.({ step, phase: "executed", url: after.url, operation: candidate.operation });
       noProgress = changed || candidate.operation === "WAIT" ? 0 : noProgress + 1;
+      if (changed) {
+        recovery = undefined;
+        sameAction = 0;
+        previousSignature = "";
+      } else if (candidate.operation !== "WAIT") {
+        recover(candidate, "produced no observable progress", false);
+      }
       observation = after;
       boundary = navigationBoundary(observation, options, initialOrigin);
       if (boundary) return handoff(boundary.status, options, observation, history, decision, boundary.reason);

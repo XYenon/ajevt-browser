@@ -158,14 +158,47 @@ test("a decision whose target disappears is never executed", async () => {
 });
 
 test("a covered click is recorded in history and does not abort the run", async () => {
-  const page = observation({ elements: [{ ref: "@e1", role: "button", name: "Continue" }] });
-  const browser = new FakeBrowser([page, page, page, page]);
+  const page = observation({
+    elements: [
+      { ref: "@e1", role: "button", name: "Continue" },
+      { ref: "@e2", role: "button", name: "Dismiss banner" },
+    ],
+  });
+  const browser = new FakeBrowser([page, page, page, page, observation({ fingerprint: "b" })]);
   browser.failures.set("@e1", new Error("Element '@e1' is covered by a banner at its click point"));
-  const jev = new FakeJev((request) => responseFor(request, "CLICK"));
+  const jev = new FakeJev((request, index) => responseFor(request, "CLICK", index ? undefined : "c1"));
   const result = await runBrowserLoop(browser, jev, { goal: "continue", url: page.url, maxSteps: 2 });
-  assert.equal(result.status, "stuck");
-  assert.equal(browser.actions.length, 0);
+  assert.equal(browser.actions.length, 1);
+  assert.equal(browser.actions[0].ref, "@e2");
   assert.match(result.recent_actions[0]?.error ?? "", /covered by a banner/);
+  const recovery = jev.calls[1].state.recovery;
+  assert.match(recovery.reason, /covered by a banner/);
+  assert.equal(recovery.avoid_previous_signature, "CLICK|@e1|");
+  assert.match(jev.calls[1].questions.operation.instructions, /different strategy/);
+  assert.ok(
+    jev.calls[1].state.candidates.every((candidate: any) => candidate.operation !== "CLICK" || candidate.ref !== "@e1"),
+  );
+});
+
+test("failed candidate becomes available again when the page changes", async () => {
+  const page = observation({ fingerprint: "a" });
+  const changed = observation({ fingerprint: "b" });
+  const browser = new FakeBrowser([page, page, page, page, changed, changed, changed]);
+  browser.failures.set("@e1", new Error("covered"));
+  const jev = new FakeJev((request, index) => {
+    if (index === 2) browser.failures.delete("@e1");
+    return responseFor(request, index === 1 ? "WAIT" : "CLICK");
+  });
+  const result = await runBrowserLoop(browser, jev, { goal: "continue", url: page.url, maxSteps: 3 });
+  assert.equal(result.recent_actions[0]?.error, "covered");
+  assert.equal(browser.actions.at(-1)?.ref, "@e1");
+  assert.ok(
+    jev.calls[1].state.candidates.every((candidate: any) => candidate.operation !== "CLICK" || candidate.ref !== "@e1"),
+  );
+  assert.ok(
+    jev.calls[2].state.candidates.some((candidate: any) => candidate.operation === "CLICK" && candidate.ref === "@e1"),
+  );
+  assert.equal(jev.calls[2].state.recovery, undefined);
 });
 
 test("a browser command failure still ends the run with an error", async () => {
@@ -181,10 +214,35 @@ test("a browser command failure still ends the run with an error", async () => {
 test("repeated action stops with bounded recovery", async () => {
   const same = observation();
   const browser = new FakeBrowser(Array(10).fill(same));
-  const jev = new FakeJev((request) => responseFor(request, "CLICK"));
+  const jev = new FakeJev((request, index) => responseFor(request, index === 2 ? "BLOCKED" : "CLICK"));
   const result = await runBrowserLoop(browser, jev, { goal: "continue", url: "https://example.test", repeatLimit: 1 });
-  assert.equal(result.status, "stuck");
+  assert.equal(result.status, "blocked");
   assert.equal(browser.actions.length, 1);
+  assert.equal(jev.calls[1].state.recovery.reason, "produced no observable progress");
+  assert.ok(
+    jev.calls[1].state.candidates.some((candidate: any) => candidate.operation === "CLICK" && candidate.ref === "@e1"),
+  );
+  assert.equal(jev.calls[2].state.recovery.avoid_previous_signature, "CLICK|@e1|");
+  assert.ok(
+    jev.calls[2].state.candidates.every((candidate: any) => candidate.operation !== "CLICK" || candidate.ref !== "@e1"),
+  );
+});
+
+test("a failed bound TYPE is skipped while the page is unchanged", async () => {
+  const page = observation({ elements: [{ ref: "@e1", role: "textbox", name: "Query" }] });
+  const browser = new FakeBrowser([page, page, page]);
+  browser.failures.set("@e1", new Error("field not editable"));
+  const jev = new FakeJev((request) => responseFor(request, "BLOCKED"));
+  const result = await runBrowserLoop(browser, jev, {
+    goal: "enter query",
+    url: page.url,
+    values: { Query: "hello" },
+    maxSteps: 2,
+  });
+  assert.equal(result.status, "blocked");
+  assert.equal(result.recent_actions.length, 1);
+  assert.equal(jev.calls[0].state.recovery.avoid_previous_signature, "TYPE|@e1|Query");
+  assert.ok(jev.calls[0].state.candidates.every((candidate: any) => candidate.ref !== "@e1"));
 });
 
 test("consecutive waits use the step budget instead of the repeat-action limit", async () => {

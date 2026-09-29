@@ -66,12 +66,13 @@ export function buildDecisionRequest(
   space: CandidateSpace,
   history: unknown[],
   model: string,
+  recovery?: { reason: string; avoid_previous_signature: string; instruction: string },
 ) {
   const operations = [...space.byOperation.keys()];
   const questions: Record<string, unknown> = {
     operation: {
       type: "choice",
-      instructions: OPERATION_INSTRUCTIONS,
+      instructions: recovery ? `${OPERATION_INSTRUCTIONS} ${recovery.instruction}` : OPERATION_INSTRUCTIONS,
       criteria: Object.fromEntries(operations.map((op) => [op, op])),
     },
     goal_completed: {
@@ -118,6 +119,7 @@ export function buildDecisionRequest(
       })),
       candidates: space.all.map(({ value, ...candidate }) => ({ ...candidate, has_value: value !== undefined })),
       recent_actions: history,
+      ...(recovery ? { recovery } : {}),
     },
     questions,
   };
@@ -161,7 +163,11 @@ export async function decide(
   history: unknown[],
   model: string,
   signal?: AbortSignal,
+  recovery?: { reason: string; avoid_previous_signature: string; instruction: string },
 ): Promise<Decision> {
-  const response = await transport.decide(buildDecisionRequest(goal, observation, space, history, model), signal);
+  const response = await transport.decide(
+    buildDecisionRequest(goal, observation, space, history, model, recovery),
+    signal,
+  );
   return resolveDecision(response, space);
 }
