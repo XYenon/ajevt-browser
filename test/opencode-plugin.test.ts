@@ -33,6 +33,7 @@ test("OpenCode V2 plugin registers ajevt_browser from the package entrypoint", a
   const [tool] = tools;
   assert.ok(tool);
   assert.equal(tool.name, "ajevt_browser");
+  assert.match(tool.description, /keep_session=true.*session_id.*handoff URL.*final call.*close/);
   assert.equal(typeof tool.execute, "function");
   assert.notEqual(tool.options?.codemode, true);
   assert.deepEqual((tool.input as { required?: string[] }).required, ["goal", "url"]);

@@ -9,6 +9,7 @@ test("Amp directory plugin registers the shared browser tool and schema", () => 
   plugin({ registerTool: (definition: PluginToolDefinition) => (tool = definition) } as unknown as PluginAPI);
   assert.match(description, /browser/);
   assert.equal(tool?.name, "ajevt_browser");
+  assert.match(tool?.description ?? "", /keep_session=true.*session_id.*handoff URL.*final call.*close/);
   assert.deepEqual(tool?.inputSchema, ajevtBrowserJsonSchema);
   assert.equal(tool?.inputSchema.required?.join(","), "goal,url");
 });

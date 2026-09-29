@@ -5,8 +5,9 @@ import { runBrowserLoop } from "./loop.js";
 import type { Handoff, Verifier } from "./types.js";
 
 export const TOOL_NAME = "ajevt_browser";
-export const TOOL_DESCRIPTION =
-  "Fast browser reflex for clear, bounded tasks with observable completion. Uses agent-browser as the only browser backend and Jev only for finite choices. Returns structured handoff instead of guessing. Do not use for exploratory research or complex reasoning.";
+export const SESSION_GUIDANCE =
+  "If a handoff may need a follow-up (input_required, ambiguous, needs_confirmation, or likely_done), set keep_session=true on the first call. Pass the returned session_id and current handoff URL to the next call; omit keep_session on the final call to close it. If no follow-up is needed, close a retained session with agent-browser --session <session_id> close. Without keep_session, the page closes and a retry starts over.";
+export const TOOL_DESCRIPTION = `Fast browser reflex for clear, bounded tasks with observable completion. Uses agent-browser as the only browser backend and Jev only for finite choices. Returns structured handoff instead of guessing. Do not use for exploratory research or complex reasoning. ${SESSION_GUIDANCE}`;
 
 export interface AjevtBrowserParams {
   goal: string;

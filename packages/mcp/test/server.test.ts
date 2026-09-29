@@ -34,6 +34,7 @@ test("MCP server exposes and executes ajevt_browser", async () => {
       listed.tools.map((tool) => tool.name),
       ["ajevt_browser"],
     );
+    assert.match(listed.tools[0]?.description ?? "", /keep_session=true.*session_id.*handoff URL.*final call.*close/);
 
     const called = await client.callTool({
       name: "ajevt_browser",

@@ -65,6 +65,29 @@ test("keepSession returns a resumable session without closing it", async () => {
   assert.equal(browser.closed, false);
 });
 
+test("input handoff retains its session only when requested, and the follow-up closes it", async () => {
+  const page = observation({ elements: [{ ref: "@e1", role: "textbox", name: "Email" }] });
+  const browser = new FakeBrowser([page]);
+  Object.defineProperty(browser, "session", { value: "shared-session" });
+  const jev = new FakeJev((request) => responseFor(request, "TYPE"));
+  const first = await runBrowserLoop(browser, jev, { goal: "enter email", url: page.url, keepSession: true });
+  assert.equal(first.status, "input_required");
+  assert.equal(first.session_id, "shared-session");
+  assert.equal(first.resumable, true);
+  assert.equal(browser.closed, false);
+
+  const followUp = await runBrowserLoop(browser, jev, {
+    goal: "enter email",
+    url: first.url,
+    values: { Email: "me@example.test" },
+    maxSteps: 1,
+  });
+  assert.equal(browser.actions[0]?.value, "me@example.test");
+  assert.equal(followUp.session_id, undefined);
+  assert.equal(followUp.resumable, false);
+  assert.equal(browser.closed, true);
+});
+
 test("stale page is re-observed and never executes the stale ref", async () => {
   const browser = new FakeBrowser([
     observation({ fingerprint: "a" }),

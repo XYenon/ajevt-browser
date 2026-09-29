@@ -183,7 +183,7 @@ Precedence is OpenCode options (OpenCode only), environment variables, explicit/
 - Destructive or commitment actions return `needs_confirmation`; `allow_risky: true` authorizes execution.
 - Repeated actions and no-progress runs have small fixed budgets.
 - `DONE` or high `goal_completed` returns `done` with passing verifiers and `likely_done` otherwise.
-- Sessions close by default. `keep_session: true` returns a `session_id` that preserves cookies and page state for a follow-up call.
+- Sessions close by default, including after `input_required`, `ambiguous`, `needs_confirmation`, and `likely_done`. If a follow-up is likely, set `keep_session: true` on the first call. Reuse the returned `session_id` and handoff `url` (not necessarily the original starting URL) on the next call. Omit `keep_session` on the final call to close the resumed session; if no follow-up is needed, close it with `agent-browser --session <session_id> close`. Retained sessions have no automatic expiry.
 - Initial loads wait for DOM content, empty observations are retried briefly, and navigation-like actions receive a short settle delay.
 - Read-only verifiers may pass on the initial page; set `require_action: true` for goals that must click, switch, or submit before completion.
 - Development and tunneled environments can use `ignore_https_errors`, `ca_cert`, `proxy`, `proxy_bypass`, and structured `host_mappings`.

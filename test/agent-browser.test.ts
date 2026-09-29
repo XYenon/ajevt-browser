@@ -80,6 +80,28 @@ console.log(JSON.stringify({ success: true, data: {} }));
   assert.equal(existsSync(argsFile), false);
 });
 
+test("a retained session at the handoff URL resumes without navigation and can be closed", async () => {
+  const argsFile = join(mkdtempSync(join(tmpdir(), "ajevt-browser-args-")), "args.jsonl");
+  const binary = fakeBrowser(`
+const { appendFileSync } = require("node:fs");
+const args = process.argv.slice(2);
+appendFileSync(${JSON.stringify(argsFile)}, JSON.stringify(args) + "\\n");
+console.log(JSON.stringify({ success: true, data: args.includes("url") ? { url: "https://example.test/form" } : {} }));
+`);
+  const browser = new AgentBrowserAdapter(binary, "retained-session");
+  await browser.open("https://example.test/form");
+  await browser.close();
+  const calls = readFileSync(argsFile, "utf8")
+    .trim()
+    .split("\n")
+    .map((line) => JSON.parse(line) as string[]);
+  assert.deepEqual(
+    calls.map((args) => args.at(-2)),
+    ["url", "close"],
+  );
+  assert.ok(calls.every((args) => args.includes("retained-session")));
+});
+
 test("post-action settle failures do not fail execution", async () => {
   const marker = join(mkdtempSync(join(tmpdir(), "ajevt-browser-marker-")), "clicked");
   const binary = fakeBrowser(`

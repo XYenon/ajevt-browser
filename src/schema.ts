@@ -96,10 +96,13 @@ export const ajevtBrowserJsonSchema = {
       additionalProperties: { type: "string" },
       description: "Hostname-to-address mappings applied through Chromium host resolver rules.",
     },
-    session_id: { type: "string", description: "Reuse a session_id returned by an earlier keep_session call." },
+    session_id: {
+      type: "string",
+      description: "Reuse a session_id returned by an earlier keep_session call; pass its handoff URL too.",
+    },
     keep_session: {
       type: "boolean",
-      description: "Keep browser state alive and return session_id for a follow-up call.",
+      description: "Keep browser state alive for a follow-up; default false closes it, including after a handoff.",
     },
     require_action: {
       type: "boolean",

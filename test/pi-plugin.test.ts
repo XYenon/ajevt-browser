@@ -69,6 +69,17 @@ test("Pi tool renders a concise call and progress state", () => {
   assert.equal(progress, "◐ Choosing next action · step 2");
 });
 
+test("Pi guidance explains how to retain and close a resumable handoff", () => {
+  const tool = registeredTool();
+  assert.match(tool.description, /keep_session=true.*session_id.*handoff URL/);
+  const guidance = tool.promptGuidelines.join(" ");
+  for (const status of ["input_required", "ambiguous", "needs_confirmation", "likely_done"])
+    assert.match(guidance, new RegExp(status));
+  assert.match(guidance, /keep_session=true.*session_id.*handoff URL.*final call.*close/);
+  assert.match(guidance, /no follow-up.*agent-browser --session <session_id> close/);
+  assert.match(guidance, /Without keep_session.*starts over/);
+});
+
 test("Pi tool renders compact and expanded handoff states", () => {
   const tool = registeredTool();
   const result = { content: [{ type: "text", text: "fallback" }], details: handoff };

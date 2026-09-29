@@ -2,7 +2,7 @@ import type { ExtensionAPI } from "@earendil-works/pi-coding-agent";
 import { Text } from "@earendil-works/pi-tui";
 import { Type } from "typebox";
 import { formatHandoff, HANDOFF_STATUS } from "../src/format.js";
-import { executeAjevtBrowser, TOOL_DESCRIPTION, TOOL_NAME, type ToolProgress } from "../src/tool.js";
+import { executeAjevtBrowser, SESSION_GUIDANCE, TOOL_DESCRIPTION, TOOL_NAME, type ToolProgress } from "../src/tool.js";
 import type { Handoff, HandoffStatus, Verifier } from "../src/types.js";
 
 const verifier = Type.Union([
@@ -99,7 +99,8 @@ export default function (pi: ExtensionAPI) {
     promptSnippet: "Run a bounded browser subtask through the Jev fast path",
     promptGuidelines: [
       "Use ajevt_browser only for a clear bounded browser subtask with an observable stop condition; handle research, exploration, and complex reasoning yourself.",
-      "Pass all known field contents through values. If input_required is returned, generate or ask for the value and call again.",
+      SESSION_GUIDANCE,
+      "Pass all known field contents through values. If input_required is returned, generate or ask for the value and call again using the retained session when available.",
       "Treat likely_done as unverified; prefer deterministic verifiers.",
     ],
     parameters: Type.Object({
@@ -134,10 +135,14 @@ export default function (pi: ExtensionAPI) {
         }),
       ),
       session_id: Type.Optional(
-        Type.String({ description: "Reuse a session_id returned by an earlier keep_session call." }),
+        Type.String({
+          description: "Reuse a session_id returned by an earlier keep_session call; pass its handoff URL too.",
+        }),
       ),
       keep_session: Type.Optional(
-        Type.Boolean({ description: "Keep browser state alive and return session_id for a follow-up call." }),
+        Type.Boolean({
+          description: "Keep browser state alive for a follow-up; default false closes it, including after a handoff.",
+        }),
       ),
       require_action: Type.Optional(
         Type.Boolean({ description: "Require at least one browser action before completion checks may pass." }),
