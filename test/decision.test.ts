@@ -32,6 +32,23 @@ test("PRESS and SCROLL expose target heads for exact key and direction", () => {
   assert.ok(request.questions.scroll_target);
 });
 
+test("HOVER uses a target head while FORWARD and RELOAD select their sole candidates", () => {
+  const page = observation({
+    elements: [
+      { ref: "@menu", role: "button", name: "Products" },
+      { ref: "@help", role: "link", name: "Help" },
+    ],
+  });
+  const space = buildCandidates(page, "hover Help");
+  const request = buildDecisionRequest("hover Help", page, space, [], "jev");
+  assert.ok(request.questions.hover_target);
+  const target = space.byOperation.get("HOVER")?.find((candidate) => candidate.ref === "@help");
+  assert.ok(target);
+  assert.equal(resolveDecision(responseFor(request, "HOVER", target.id), space).candidate?.ref, "@help");
+  assert.equal(resolveDecision(responseFor(request, "FORWARD"), space).candidate?.operation, "FORWARD");
+  assert.equal(resolveDecision(responseFor(request, "RELOAD"), space).candidate?.operation, "RELOAD");
+});
+
 test("only validates the target head selected by operation", () => {
   const page = observation();
   const space = buildCandidates(page, "continue");

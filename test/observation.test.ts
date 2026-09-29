@@ -146,6 +146,35 @@ test("a field keeps its candidate slot on a page full of links", () => {
   assert.equal(candidate?.value, "Browser automation");
 });
 
+test("hover targets remain available within a full click budget, but disabled controls are excluded", () => {
+  const page = observation({
+    elements: [
+      { ref: "@menu", role: "menuitem", name: "More", disabled: true },
+      ...Array.from({ length: 40 }, (_, index) => ({ ref: `@l${index}`, role: "link", name: `Link ${index}` })),
+    ],
+  });
+  const space = buildCandidates(page, "hover Link 30", {}, 32);
+  assert.equal(space.byOperation.get("HOVER")?.length, 4);
+  assert.ok(space.byOperation.get("HOVER")?.some((candidate) => candidate.ref === "@l30"));
+  assert.equal(
+    space.byOperation.get("HOVER")?.some((candidate) => candidate.ref === "@menu"),
+    false,
+  );
+  assert.ok(space.byOperation.get("CLICK")?.some((candidate) => candidate.ref === "@l30"));
+});
+
+test("navigation and a finite set of useful keys are offered independently of page controls", () => {
+  const space = buildCandidates(observation({ elements: [] }), "go forward and press Shift+Tab");
+  assert.ok(space.byOperation.has("BACK"));
+  assert.ok(space.byOperation.has("FORWARD"));
+  assert.ok(space.byOperation.has("RELOAD"));
+  const keys = space.byOperation.get("PRESS")?.map((candidate) => candidate.key);
+  assert.ok(keys?.includes("Shift+Tab"));
+  assert.ok(keys?.includes("ArrowLeft"));
+  assert.ok(keys?.includes("Control+a"));
+  assert.equal(keys?.includes("Control+v"), false);
+});
+
 test("a value key binds to a partially matching field name", () => {
   const page = normalizeSnapshot({
     data: {

@@ -1,4 +1,16 @@
-export type Operation = "CLICK" | "TYPE" | "SELECT" | "PRESS" | "SCROLL" | "BACK" | "WAIT" | "DONE" | "BLOCKED";
+export type Operation =
+  | "CLICK"
+  | "HOVER"
+  | "TYPE"
+  | "SELECT"
+  | "PRESS"
+  | "SCROLL"
+  | "BACK"
+  | "FORWARD"
+  | "RELOAD"
+  | "WAIT"
+  | "DONE"
+  | "BLOCKED";
 export type HandoffStatus =
   | "done"
   | "likely_done"

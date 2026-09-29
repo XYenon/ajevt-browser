@@ -25,7 +25,14 @@ export function responseFor(
     stuck: { noul: options.stuck ?? 0.05 },
     risky: { noul: options.risky ?? 0.05 },
   };
-  for (const head of ["click_target", "type_target", "select_target", "press_target", "scroll_target"]) {
+  for (const head of [
+    "click_target",
+    "hover_target",
+    "type_target",
+    "select_target",
+    "press_target",
+    "scroll_target",
+  ]) {
     const ids = Object.keys(request.questions[head]?.criteria ?? {});
     if (ids.length)
       answers[head] = choice(

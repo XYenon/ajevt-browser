@@ -296,6 +296,9 @@ export class AgentBrowserAdapter implements BrowserAdapter {
       case "CLICK":
         args = ["click", candidate.ref!];
         break;
+      case "HOVER":
+        args = ["hover", candidate.ref!];
+        break;
       case "TYPE":
         args = ["fill", candidate.ref!, candidate.value!];
         break;
@@ -311,6 +314,12 @@ export class AgentBrowserAdapter implements BrowserAdapter {
       case "BACK":
         args = ["back"];
         break;
+      case "FORWARD":
+        args = ["forward"];
+        break;
+      case "RELOAD":
+        args = ["reload"];
+        break;
       case "WAIT":
         args = ["wait", "750"];
         break;
@@ -324,7 +333,7 @@ export class AgentBrowserAdapter implements BrowserAdapter {
       if (!diagnosis) throw error;
       throw new Error(`${error instanceof Error ? error.message : String(error)} — ${diagnosis}`);
     }
-    if (["CLICK", "PRESS", "BACK"].includes(candidate.operation)) {
+    if (["CLICK", "PRESS", "BACK", "FORWARD", "RELOAD"].includes(candidate.operation)) {
       // A click can commit a new document a moment after the command returns.
       // Give the navigation a chance to start, then wait for the new document's
       // DOM so the following observation does not read the page being replaced.

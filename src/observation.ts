@@ -244,6 +244,10 @@ export function buildCandidates(
   const ranked = observation.elements
     .map((element, index) => ({ element, index, score: usefulness(goal, element, index) }))
     .sort((a, b) => b.score - a.score || a.index - b.index);
+  const hoverTargets = ranked.filter(
+    ({ element }) => !element.disabled && ["button", "link", "menuitem", "tab"].includes(element.role),
+  );
+  const hoverBudget = Math.min(4, hoverTargets.length);
 
   const add = (candidate: Omit<Candidate, "id">) => candidates.push({ ...candidate, id: `c${candidates.length + 1}` });
   // Fields and option lists are few and are usually the point of the goal. They
@@ -258,7 +262,7 @@ export function buildCandidates(
     add(candidate);
   };
   const addAction = (candidate: Omit<Candidate, "id">) => {
-    if (candidates.length < max) add(candidate);
+    if (candidates.length < max - hoverBudget) add(candidate);
   };
   for (const { element } of ranked) {
     if (element.disabled) continue;
@@ -300,10 +304,34 @@ export function buildCandidates(
       });
     }
   }
-  for (const key of ["Enter", "Escape", "Tab"] as const) add({ operation: "PRESS", key, label: `Press ${key}` });
+  for (const { element } of hoverTargets.slice(0, hoverBudget)) {
+    if (candidates.length < max)
+      add({ operation: "HOVER", ref: element.ref, label: `Hover ${element.role} “${element.name}”` });
+  }
+  for (const key of [
+    "Enter",
+    "Escape",
+    "Tab",
+    "Shift+Tab",
+    "Space",
+    "ArrowUp",
+    "ArrowDown",
+    "ArrowLeft",
+    "ArrowRight",
+    "Home",
+    "End",
+    "PageUp",
+    "PageDown",
+    "Backspace",
+    "Delete",
+    "Control+a",
+  ] as const)
+    add({ operation: "PRESS", key, label: `Press ${key}` });
   add({ operation: "SCROLL", direction: "down", label: "Scroll down" });
   add({ operation: "SCROLL", direction: "up", label: "Scroll up" });
   add({ operation: "BACK", label: "Go back" });
+  add({ operation: "FORWARD", label: "Go forward" });
+  add({ operation: "RELOAD", label: "Reload the current page" });
   add({ operation: "WAIT", label: "Wait briefly for the page to update" });
   add({ operation: "DONE", label: "Claim that the bounded goal is complete" });
   add({ operation: "BLOCKED", label: "Stop because no safe supported action can progress" });

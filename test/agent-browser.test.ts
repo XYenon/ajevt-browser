@@ -98,6 +98,35 @@ if (args.includes("click")) {
   await browser.execute({ id: "click", operation: "CLICK", ref: "@e1", label: "Open" });
 });
 
+test("hover, forward, reload, and key combinations map to their agent-browser commands", async () => {
+  const directory = mkdtempSync(join(tmpdir(), "ajevt-browser-args-"));
+  const argsFile = join(directory, "args.jsonl");
+  const binary = fakeBrowser(`
+const { appendFileSync } = require("node:fs");
+appendFileSync(${JSON.stringify(argsFile)}, JSON.stringify(process.argv.slice(2)) + "\\n");
+console.log(JSON.stringify({ success: true, data: {} }));
+`);
+  const browser = new AgentBrowserAdapter(binary);
+  await browser.open("https://example.test");
+  for (const candidate of [
+    { id: "hover", operation: "HOVER", ref: "@e2", label: "Hover menu" },
+    { id: "forward", operation: "FORWARD", label: "Go forward" },
+    { id: "reload", operation: "RELOAD", label: "Reload" },
+    { id: "press", operation: "PRESS", key: "Shift+Tab", label: "Press Shift+Tab" },
+  ] as const)
+    await browser.execute(candidate);
+  const calls = readFileSync(argsFile, "utf8")
+    .trim()
+    .split("\n")
+    .map((line) => JSON.parse(line) as string[]);
+  const commands = calls.map((args) => args.slice(2, -1));
+  assert.ok(commands.some((args) => JSON.stringify(args) === JSON.stringify(["hover", "@e2"])));
+  assert.ok(commands.some((args) => JSON.stringify(args) === JSON.stringify(["forward"])));
+  assert.ok(commands.some((args) => JSON.stringify(args) === JSON.stringify(["reload"])));
+  assert.ok(commands.some((args) => JSON.stringify(args) === JSON.stringify(["press", "Shift+Tab"])));
+  assert.equal(commands.filter((args) => args[0] === "wait" && args[1] === "500").length, 3);
+});
+
 test("a click that loses the page reports the new-tab cause", async () => {
   const binary = fakeBrowser(`
 const args = process.argv.slice(2);
