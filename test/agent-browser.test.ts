@@ -228,3 +228,55 @@ else console.log(JSON.stringify({ success: true, data: {} }));
   await browser.open("https://example.test");
   await assert.rejects(browser.observe(), /agent-browser get value failed: state unavailable/);
 });
+
+test("observation batches metadata and distinct form states after establishing refs", async () => {
+  const directory = mkdtempSync(join(tmpdir(), "ajevt-browser-args-"));
+  const callsFile = join(directory, "calls.jsonl");
+  const binary = fakeBrowser(`
+const { appendFileSync, readFileSync } = require("node:fs");
+const args = process.argv.slice(2);
+if (args.includes("snapshot")) {
+  appendFileSync(${JSON.stringify(callsFile)}, JSON.stringify(["snapshot"]) + "\\n");
+  console.log(JSON.stringify({ success: true, data: {
+    refs: { e1: { role: "textbox", name: "Query" }, e2: { role: "textbox", name: "Password" },
+      e3: { role: "checkbox", name: "First" }, e4: { role: "checkbox", name: "Second" } },
+    snapshot: '- textbox "Query" [ref=e1]\\n- textbox "Password" [ref=e2]\\n- checkbox "First" [ref=e3]\\n- checkbox "Second" [ref=e4]'
+  } }));
+} else if (args.includes("batch")) {
+  const commands = JSON.parse(readFileSync(0, "utf8"));
+  appendFileSync(${JSON.stringify(callsFile)}, JSON.stringify(commands) + "\\n");
+  const results = [
+    { result: { url: "https://example.test/new", title: "New", text: "Finished" } },
+    { value: "search term" }, { value: "private" }, { checked: false }, { checked: true }
+  ];
+  console.log(JSON.stringify(commands.map((command, i) => ({ command, success: true, result: results[i] }))));
+} else console.log(JSON.stringify({ success: true, data: {} }));
+`);
+  const browser = new AgentBrowserAdapter(binary);
+  await browser.open("https://example.test");
+  const observation = await browser.observe();
+  assert.equal(observation.url, "https://example.test/new");
+  assert.equal(observation.title, "New");
+  assert.equal(observation.pageText, "Finished");
+  assert.deepEqual(
+    observation.elements.map(({ ref, value, filled, checked }) => ({ ref, value, filled, checked })),
+    [
+      { ref: "@e1", value: "search term", filled: true, checked: undefined },
+      { ref: "@e2", value: "[redacted]", filled: true, checked: undefined },
+      { ref: "@e3", value: undefined, filled: undefined, checked: false },
+      { ref: "@e4", value: undefined, filled: undefined, checked: true },
+    ],
+  );
+  const calls = readFileSync(callsFile, "utf8")
+    .trim()
+    .split("\n")
+    .map((line) => JSON.parse(line));
+  assert.deepEqual(calls[0], ["snapshot"]);
+  assert.deepEqual(calls[1].slice(1), [
+    ["get", "value", "@e1"],
+    ["get", "value", "@e2"],
+    ["is", "checked", "@e3"],
+    ["is", "checked", "@e4"],
+  ]);
+  assert.equal(calls.length, 2);
+});

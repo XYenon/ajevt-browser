@@ -27,11 +27,12 @@ function run(
   args: string[],
   signal?: AbortSignal,
   timeoutMs = 30_000,
+  input?: string,
 ): Promise<CommandResult> {
   return new Promise((resolve, reject) => {
     const child = spawn(binary, ["--session", session, ...args, "--json"], {
       shell: false,
-      stdio: ["ignore", "pipe", "pipe"],
+      stdio: [input === undefined ? "ignore" : "pipe", "pipe", "pipe"],
     });
     let stdout = "",
       stderr = "",
@@ -60,8 +61,13 @@ function run(
       if (stream === "stdout") stdout += chunk;
       else stderr += chunk;
     };
-    child.stdout.on("data", (chunk) => collect("stdout", chunk));
-    child.stderr.on("data", (chunk) => collect("stderr", chunk));
+    child.stdout!.on("data", (chunk) => collect("stdout", chunk));
+    child.stderr!.on("data", (chunk) => collect("stderr", chunk));
+    if (input !== undefined) {
+      // Unsupported batch commands may exit before consuming stdin.
+      child.stdin!.on("error", () => undefined);
+      child.stdin!.end(input);
+    }
     child.on("error", done);
     child.on("close", (code) => done(undefined, code ?? 1));
     const abort = () => {
@@ -115,6 +121,17 @@ export class AgentBrowserAdapter implements BrowserAdapter {
     return run(this.binary, this.session, [...this.globalArgs, ...args], signal, timeoutMs);
   }
 
+  private batch(commands: string[][], signal?: AbortSignal): Promise<CommandResult> {
+    return run(
+      this.binary,
+      this.session,
+      [...this.globalArgs, "batch", "--bail"],
+      signal,
+      Math.min(120_000, 30_000 + commands.length * 5_000),
+      JSON.stringify(commands),
+    );
+  }
+
   async open(url: string, options: BrowserOpenOptions = {}, signal?: AbortSignal): Promise<void> {
     const hostResolverRules: string[] = [];
     this.globalArgs = [];
@@ -150,8 +167,76 @@ export class AgentBrowserAdapter implements BrowserAdapter {
 
   private async observeOnce(signal?: AbortSignal): Promise<Observation> {
     // Commands targeting one agent-browser session share daemon/browser state.
-    // Keep them sequential so navigation and value reads cannot race each other.
+    // Snapshot first to establish refs, then batch the dependent reads in order.
     const payload = parse(await this.command(["snapshot", "-i"], signal), "agent-browser snapshot");
+    const elements = normalizeSnapshot(payload).elements;
+    const stateCommands = elements.flatMap((element) => {
+      if (["textbox", "searchbox", "spinbutton", "combobox"].includes(element.role))
+        return [["get", "value", element.ref]];
+      if (["checkbox", "radio", "switch"].includes(element.role)) return [["is", "checked", element.ref]];
+      return [];
+    });
+    const metadata = ["eval", "({url:location.href,title:document.title,text:document.body?.innerText ?? ''})"];
+    try {
+      const result = await this.batch([metadata, ...stateCommands], signal);
+      if (result.code !== 0) throw new Error(result.stderr.trim() || result.stdout.trim());
+      const responses = JSON.parse(result.stdout);
+      if (!Array.isArray(responses) || responses.length !== stateCommands.length + 1)
+        throw new Error("agent-browser batch returned an incomplete response");
+      const data = responses[0]?.result?.result;
+      if (
+        responses.some((response: any) => response.success !== true) ||
+        typeof data?.url !== "string" ||
+        typeof data?.title !== "string" ||
+        typeof data?.text !== "string"
+      )
+        throw new Error("agent-browser batch returned an invalid response");
+      payload.data ??= {};
+      payload.data.url = data.url;
+      payload.data.title = data.title;
+      payload.data.text = data.text;
+      let index = 1;
+      for (const element of elements) {
+        if (["textbox", "searchbox", "spinbutton", "combobox"].includes(element.role)) {
+          const value = responses[index++]?.result?.value;
+          if (typeof value !== "string")
+            throw new Error(`agent-browser get value returned no string value for ${element.ref}`);
+          element.filled = value.length > 0;
+          element.value = isSecretField(element) ? "[redacted]" : value;
+        } else if (["checkbox", "radio", "switch"].includes(element.role)) {
+          const checked = responses[index++]?.result?.checked;
+          if (typeof checked !== "boolean")
+            throw new Error(`agent-browser is checked returned no boolean state for ${element.ref}`);
+          element.checked = checked;
+        }
+      }
+      return this.finishObservation(payload, elements);
+    } catch (error) {
+      if (signal?.aborted || error instanceof AgentBrowserCommandError) throw error;
+      // Older agent-browser builds may not support batch or eval. Preserve the
+      // original observation path rather than losing page state altogether.
+      return this.observeLegacy(payload, elements, signal);
+    }
+  }
+
+  private finishObservation(payload: any, elements: Observation["elements"]): Observation {
+    const observation = normalizeSnapshot(payload);
+    return normalizeSnapshot({
+      data: {
+        url: observation.url,
+        title: observation.title,
+        snapshot: observation.text,
+        text: observation.pageText,
+        refs: Object.fromEntries(elements.map((element) => [element.ref.slice(1), element])),
+      },
+    });
+  }
+
+  private async observeLegacy(
+    payload: any,
+    elements: Observation["elements"],
+    signal?: AbortSignal,
+  ): Promise<Observation> {
     const urlPayload = parse(await this.command(["get", "url"], signal), "agent-browser get url");
     const titlePayload = parse(await this.command(["get", "title"], signal), "agent-browser get title");
     const pageText = await this.readPageText(signal);
@@ -161,8 +246,7 @@ export class AgentBrowserAdapter implements BrowserAdapter {
     // `snapshot -i` only covers interactive nodes and headings, so the rendered
     // page text is what makes text verifiers and page context meaningful.
     if (pageText !== undefined) payload.data.text = pageText;
-    const observation = normalizeSnapshot(payload);
-    for (const element of observation.elements) {
+    for (const element of elements) {
       if (["textbox", "searchbox", "spinbutton", "combobox"].includes(element.role)) {
         const result = parse(await this.command(["get", "value", element.ref], signal), "agent-browser get value");
         if (typeof result?.data?.value !== "string")
@@ -177,15 +261,7 @@ export class AgentBrowserAdapter implements BrowserAdapter {
         element.checked = result.data.checked;
       }
     }
-    return normalizeSnapshot({
-      data: {
-        url: observation.url,
-        title: observation.title,
-        snapshot: observation.text,
-        text: observation.pageText,
-        refs: Object.fromEntries(observation.elements.map((element) => [element.ref.slice(1), element])),
-      },
-    });
+    return this.finishObservation(payload, elements);
   }
 
   // Rendered page text. agent-browser's `read` reads the active tab, so a
