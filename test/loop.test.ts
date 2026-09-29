@@ -100,6 +100,46 @@ test("a lazy-loading page still executes once the chosen target survives", async
   assert.match(result.reason, /Maximum step budget/);
 });
 
+test("a reused ref cannot bypass changed local state or form context after two stale observations", async (t) => {
+  const target = { ref: "@e5", role: "button", name: "Continue" };
+  const form = (name: string) =>
+    normalizeSnapshot({
+      data: {
+        url: "https://example.test/",
+        refs: { e5: { role: "button", name: "Continue" } },
+        snapshot: `- form "${name}"\n  - button "Continue" [ref=e5]`,
+      },
+    }).elements[0].context;
+  const changes = {
+    value: { ...target, value: "Already submitted" },
+    checked: { ...target, checked: true },
+    disabled: { ...target, disabled: true },
+    form: { ...target, context: form("Payment") },
+  };
+  for (const [kind, changed] of Object.entries(changes)) {
+    await t.test(kind, async () => {
+      const original = { ...target, context: form("Shipping") };
+      const browser = new FakeBrowser([
+        observation({ fingerprint: "a", elements: [original] }),
+        observation({ fingerprint: "b", elements: [original] }),
+        observation({ fingerprint: "c", elements: [original] }),
+        observation({ fingerprint: "d", elements: [{ ...original, ...changed }] }),
+      ]);
+      const jev = new FakeJev((request, index) =>
+        index < 3 ? responseFor(request, "CLICK") : responseFor(request, "DONE", undefined, { done: 0.95 }),
+      );
+      const result = await runBrowserLoop(browser, jev, {
+        goal: "continue",
+        url: "https://example.test/",
+        maxSteps: 4,
+      });
+      assert.equal(browser.actions.length, 0);
+      assert.equal(jev.calls.length, 4);
+      assert.equal(result.status, "likely_done");
+    });
+  }
+});
+
 test("a decision whose target disappears is never executed", async () => {
   const browser = new FakeBrowser([
     observation({ fingerprint: "a", elements: [{ ref: "@e1", role: "button", name: "Continue" }] }),

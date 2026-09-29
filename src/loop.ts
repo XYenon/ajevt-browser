@@ -159,11 +159,9 @@ export async function runBrowserLoop(
   const filledRefs = new Set<string>();
   const initialOrigin = origin(options.url);
 
-  // Pages that lazy-load content change their fingerprint for a few seconds
-  // after every action. Re-observe to keep the decision fresh, but once the
-  // chosen target is still the same element, act on the newest observation
-  // instead of re-deciding until the step budget runs out. The newest
-  // observation always comes back, so a re-decide never repeats a stale view.
+  // Lazy-loading can change unrelated page content between every observation.
+  // After two re-decisions, reuse only a decision whose target and local
+  // context are unchanged and whose action is still offered on the fresh page.
   const refreshBeforeExecution = async (
     step: number,
     candidate: Candidate,
@@ -175,16 +173,31 @@ export async function runBrowserLoop(
       staleReobserves = 0;
       return { observation: fresh, proceed: true };
     }
+    const current = target && fresh.elements.find((element) => element.ref === target.ref);
     const targetSurvives =
-      target === undefined ||
-      fresh.elements.some(
-        (element) => element.ref === target.ref && element.role === target.role && element.name === target.name,
-      );
-    if (targetSurvives && staleReobserves >= staleReobserveLimit) {
+      current &&
+      target.role === current.role &&
+      target.name === current.name &&
+      target.context === current.context &&
+      target.value === current.value &&
+      target.filled === current.filled &&
+      target.checked === current.checked &&
+      target.selected === current.selected &&
+      target.disabled === current.disabled &&
+      JSON.stringify(target.options) === JSON.stringify(current.options);
+    const stillOffered = buildCandidates(fresh, options.goal, values).all.some(
+      (offered) =>
+        offered.operation === candidate.operation &&
+        offered.ref === candidate.ref &&
+        offered.option === candidate.option &&
+        offered.value === candidate.value &&
+        offered.risky === candidate.risky,
+    );
+    if (targetSurvives && stillOffered && staleReobserves >= staleReobserveLimit && fresh.url === decidedOn.url) {
       staleReobserves = 0;
       return { observation: fresh, proceed: true };
     }
-    staleReobserves += 1;
+    staleReobserves = targetSurvives && stillOffered && fresh.url === decidedOn.url ? staleReobserves + 1 : 0;
     await options.onProgress?.({ step, phase: "stale-reobserve", url: fresh.url });
     return { observation: fresh, proceed: false };
   };
@@ -263,6 +276,8 @@ export async function runBrowserLoop(
       if (boundTypeCandidate) {
         const refreshed = await refreshBeforeExecution(step, boundTypeCandidate, observation);
         observation = refreshed.observation;
+        boundary = navigationBoundary(observation, options, initialOrigin);
+        if (boundary) return handoff(boundary.status, options, observation, history, {}, boundary.reason);
         if (!refreshed.proceed) continue;
         try {
           await browser.execute(boundTypeCandidate, options.signal);
@@ -420,6 +435,8 @@ export async function runBrowserLoop(
 
       const refreshed = await refreshBeforeExecution(step, candidate, observation);
       observation = refreshed.observation;
+      boundary = navigationBoundary(observation, options, initialOrigin);
+      if (boundary) return handoff(boundary.status, options, observation, history, decision, boundary.reason);
       if (!refreshed.proceed) continue;
 
       // Repeat detection runs after the freshness check so decisions abandoned

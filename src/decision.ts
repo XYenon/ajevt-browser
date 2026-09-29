@@ -112,7 +112,7 @@ export function buildDecisionRequest(
     state: {
       goal,
       page: { url: observation.url, title: observation.title, text: observation.text },
-      elements: observation.elements.map((element) => ({
+      elements: observation.elements.map(({ context, ...element }) => ({
         ...element,
         value: element.value === "[redacted]" ? "[redacted]" : element.value,
       })),

@@ -25,6 +25,8 @@ export interface BrowserElement {
   ref: string;
   role: string;
   name: string;
+  // Nearby accessibility-tree context (including containing form/dialog).
+  context?: string;
   value?: string;
   // Whether the field currently holds a value. Recorded before redaction so a
   // filled secret field is still recognizable as filled.

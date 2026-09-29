@@ -102,6 +102,37 @@ test("rendered page text is kept beside the accessibility text", () => {
   );
 });
 
+test("candidate context follows its form and nearby non-interactive text, not unrelated content", () => {
+  const snapshot = (label: string, nearby: string, unrelated: string) =>
+    normalizeSnapshot({
+      data: {
+        refs: { e5: { role: "button", name: "Continue" }, e6: { role: "link", name: "Help" } },
+        snapshot: `- form "${label}"\n  - paragraph: ${nearby}\n  - button "Continue" [ref=e5]\n- region "${unrelated}"\n  - link "Help" [ref=e6]`,
+      },
+    }).elements.find((element) => element.ref === "@e5")?.context;
+  const original = snapshot("Shipping", "Address verified", "Latest news");
+  assert.match(original ?? "", /Shipping.*Address verified/);
+  assert.notEqual(original, snapshot("Payment", "Address verified", "Latest news"));
+  assert.notEqual(original, snapshot("Shipping", "Address changed", "Latest news"));
+  assert.equal(original, snapshot("Shipping", "Address verified", "New articles"));
+});
+
+test("candidate context survives the adapter's second normalization", () => {
+  const first = normalizeSnapshot({
+    data: {
+      refs: { e5: { role: "button", name: "Continue" } },
+      snapshot: '- form "Shipping"\n  - button "Continue" [ref=e5]',
+    },
+  });
+  const second = normalizeSnapshot({
+    data: {
+      snapshot: first.text,
+      refs: { e5: first.elements[0] },
+    },
+  });
+  assert.equal(second.elements[0].context, first.elements[0].context);
+});
+
 test("a filled secret field is not offered for typing again", () => {
   const page = normalizeSnapshot({
     data: {

@@ -44,6 +44,7 @@ function hash(value: unknown): string {
 interface TreeAttributes {
   parent?: string;
   name?: string;
+  context?: string;
   disabled?: boolean;
   selected?: boolean;
 }
@@ -53,7 +54,8 @@ interface TreeAttributes {
 // `disabled`/`selected`, so parse it to recover parent/child relationships.
 function parseSnapshotTree(snapshot: string): Map<string, TreeAttributes> {
   const attributes = new Map<string, TreeAttributes>();
-  const stack: Array<{ indent: number; ref?: string }> = [];
+  const stack: Array<{ indent: number; ref?: string; label: string }> = [];
+  const nearby = new Map<number, string[]>();
   for (const line of snapshot.split("\n")) {
     const lineMatch = /^(\s*)- (.*)$/.exec(line);
     if (!lineMatch) continue;
@@ -63,16 +65,20 @@ function parseSnapshotTree(snapshot: string): Map<string, TreeAttributes> {
     const tokens = bracket ? bracket[1].split(",").map((token) => token.trim()) : [];
     const ref = tokens.find((token) => token.startsWith("ref="))?.slice(4);
     while (stack.length && stack[stack.length - 1].indent >= indent) stack.pop();
+    for (const depth of nearby.keys()) if (depth > indent) nearby.delete(depth);
+    const label = redactSnapshotText(clean(body.replace(/\s*\[[^\]]*\bref=[^\]]*\]/, "")));
     if (ref) {
       const name = /^(?:- )?\S*(?::\s*)? "((?:[^"\\]|\\.)*)"/.exec(body)?.[1];
       attributes.set(ref, {
         parent: stack.findLast((entry) => entry.ref)?.ref,
         name: name ? name.replace(/\\"/g, '"') : undefined,
+        context: [...stack.map((entry) => entry.label), ...(nearby.get(indent) ?? [])].join(" | "),
         disabled: tokens.includes("disabled"),
         selected: tokens.includes("selected"),
       });
-    }
-    stack.push({ indent, ref });
+      nearby.delete(indent);
+    } else nearby.set(indent, [...(nearby.get(indent) ?? []).slice(-1), label]);
+    stack.push({ indent, ref, label });
   }
   return attributes;
 }
@@ -123,6 +129,7 @@ export function normalizeSnapshot(raw: unknown, maxText = 2400): Observation {
     const ref = id.startsWith("@") ? id : `@${id}`;
     const name = clean(node.name ?? node.label ?? node.placeholder ?? ref);
     const element: BrowserElement = { ref, role, name };
+    if (typeof node.context === "string") element.context = clean(node.context);
     if (typeof node.disabled === "boolean") element.disabled = node.disabled;
     if (typeof node.filled === "boolean") element.filled = node.filled;
     if (typeof node.checked === "boolean") element.checked = node.checked;
@@ -152,6 +159,7 @@ export function normalizeSnapshot(raw: unknown, maxText = 2400): Observation {
   const treeText = typeof data.snapshot === "string" ? data.snapshot : "";
   const renderedText = typeof data.text === "string" ? data.text : "";
   const tree = parseSnapshotTree(treeText);
+  for (const element of elements) element.context ??= tree.get(element.ref.slice(1))?.context;
   if (tree.size) foldSelectOptions(elements, tree);
   // The accessibility tree keeps the structure Jev reasons over; the rendered
   // page text is what text verifiers can honestly match against.
