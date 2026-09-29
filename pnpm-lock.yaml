@@ -16,7 +16,7 @@ importers:
         version: 2.5.14
       '@earendil-works/pi-coding-agent':
         specifier: ^0.87.0
-        version: 0.87.1(@modelcontextprotocol/sdk@1.30.0(zod@4.1.8))(ws@8.21.3)(zod@4.1.8)
+        version: 0.87.1(@modelcontextprotocol/sdk@1.31.0(zod@4.1.8))(ws@8.21.3)(zod@4.1.8)
       '@earendil-works/pi-tui':
         specifier: ^0.87.0
         version: 0.87.1
@@ -49,7 +49,7 @@ importers:
     dependencies:
       '@modelcontextprotocol/sdk':
         specifier: ^1.30.0
-        version: 1.30.1(zod@4.1.8)
+        version: 1.31.0(zod@4.1.8)
       ajevt-browser:
         specifier: workspace:*
         version: link:../..
@@ -513,18 +513,8 @@ packages:
   '@isaacs/string-locale-compare@1.1.0':
     resolution: {integrity: sha512-SQ7Kzhh9+D+ZW9MA0zkYv3VXhIDNx+LzM6EJ+/65I3QY+enU6Itte7E5XX7EWrqLW2FN4n06GWzBnPoC3th2aQ==}
 
-  '@modelcontextprotocol/sdk@1.30.0':
-    resolution: {integrity: sha512-xKd8OIzlqNzcqcNumGAa6g+PW2kjD5vrpcKOnfldAUPP3j7lnqMPwlTXQm8gF+UwH72z0lqaRbjr9hqGz0eITA==}
-    engines: {node: '>=18'}
-    peerDependencies:
-      '@cfworker/json-schema': ^4.1.1
-      zod: ^3.25 || ^4.0
-    peerDependenciesMeta:
-      '@cfworker/json-schema':
-        optional: true
-
-  '@modelcontextprotocol/sdk@1.30.1':
-    resolution: {integrity: sha512-H2HxLvC3HDNybePJaLdSrU1hhUK5iQw+WvV1b01myFyI7sdVGe1u/IPTE5D9fGCiJDVtgMV/lmFkQXLmQyIFYA==}
+  '@modelcontextprotocol/sdk@1.31.0':
+    resolution: {integrity: sha512-UvTMgnNlnIBO/22ob2RcVGDlcvOslQs8T59+FTGdA0L27a39fdGF/EDETNtDVK4DZGpwomlsYpRdA8UXcVL/pw==}
     engines: {node: '>=18'}
     peerDependencies:
       '@cfworker/json-schema': ^4.1.1
@@ -1076,11 +1066,6 @@ packages:
 
   ajv-formats@3.0.1:
     resolution: {integrity: sha512-8iUql50EUR+uUcdRQ3HDqa6EVyo3docL8g5WJ3FNcWmu62IbkGUue/pEyLBW8VGKKucTPgqeks4fIU1DA4yowQ==}
-    peerDependencies:
-      ajv: ^8.0.0
-    peerDependenciesMeta:
-      ajv:
-        optional: true
 
   ajv@8.20.0:
     resolution: {integrity: sha512-Thbli+OlOj+iMPYFBVBfJ3OmCAnaSyNn4M1vz9T6Gka5Jt9ba/HIR56joy65tY6kx/FCF5VXNB819Y7/GUrBGA==}
@@ -2763,10 +2748,10 @@ snapshots:
     dependencies:
       esbuild: 0.28.2
 
-  '@earendil-works/pi-agent-core@0.87.1(@modelcontextprotocol/sdk@1.30.0(zod@4.1.8))(ws@8.21.3)(zod@4.1.8)':
+  '@earendil-works/pi-agent-core@0.87.1(@modelcontextprotocol/sdk@1.31.0(zod@4.1.8))(ws@8.21.3)(zod@4.1.8)':
     dependencies:
       '@earendil-works/chord': 0.87.1
-      '@earendil-works/pi-ai': 0.87.1(@modelcontextprotocol/sdk@1.30.0(zod@4.1.8))(ws@8.21.3)(zod@4.1.8)
+      '@earendil-works/pi-ai': 0.87.1(@modelcontextprotocol/sdk@1.31.0(zod@4.1.8))(ws@8.21.3)(zod@4.1.8)
       '@earendil-works/pi-telemetry': 0.87.1
       diff: 8.0.4
       ignore: 7.0.8
@@ -2781,12 +2766,12 @@ snapshots:
       - ws
       - zod
 
-  '@earendil-works/pi-ai@0.87.1(@modelcontextprotocol/sdk@1.30.0(zod@4.1.8))(ws@8.21.3)(zod@4.1.8)':
+  '@earendil-works/pi-ai@0.87.1(@modelcontextprotocol/sdk@1.31.0(zod@4.1.8))(ws@8.21.3)(zod@4.1.8)':
     dependencies:
       '@anthropic-ai/sdk': 0.124.0(zod@4.1.8)
       '@aws-sdk/client-bedrock-runtime': 3.1127.0
       '@earendil-works/pi-telemetry': 0.87.1
-      '@google/genai': 2.21.0(@modelcontextprotocol/sdk@1.30.0(zod@4.1.8))
+      '@google/genai': 2.21.0(@modelcontextprotocol/sdk@1.31.0(zod@4.1.8))
       '@smithy/node-http-handler': 4.12.1
       http-proxy-agent: 9.1.0
       https-proxy-agent: 9.1.0
@@ -2802,11 +2787,11 @@ snapshots:
       - ws
       - zod
 
-  '@earendil-works/pi-coding-agent@0.87.1(@modelcontextprotocol/sdk@1.30.0(zod@4.1.8))(ws@8.21.3)(zod@4.1.8)':
+  '@earendil-works/pi-coding-agent@0.87.1(@modelcontextprotocol/sdk@1.31.0(zod@4.1.8))(ws@8.21.3)(zod@4.1.8)':
     dependencies:
       '@earendil-works/chord': 0.87.1
-      '@earendil-works/pi-agent-core': 0.87.1(@modelcontextprotocol/sdk@1.30.0(zod@4.1.8))(ws@8.21.3)(zod@4.1.8)
-      '@earendil-works/pi-ai': 0.87.1(@modelcontextprotocol/sdk@1.30.0(zod@4.1.8))(ws@8.21.3)(zod@4.1.8)
+      '@earendil-works/pi-agent-core': 0.87.1(@modelcontextprotocol/sdk@1.31.0(zod@4.1.8))(ws@8.21.3)(zod@4.1.8)
+      '@earendil-works/pi-ai': 0.87.1(@modelcontextprotocol/sdk@1.31.0(zod@4.1.8))(ws@8.21.3)(zod@4.1.8)
       '@earendil-works/pi-tui': 0.87.1
       '@silvia-odwyer/photon-node': 0.3.4
       chalk: 6.0.0
@@ -2952,14 +2937,14 @@ snapshots:
 
   '@gar/promise-retry@1.0.3': {}
 
-  '@google/genai@2.21.0(@modelcontextprotocol/sdk@1.30.0(zod@4.1.8))':
+  '@google/genai@2.21.0(@modelcontextprotocol/sdk@1.31.0(zod@4.1.8))':
     dependencies:
       google-auth-library: 10.9.1
       p-retry: 4.6.2
       protobufjs: 7.6.6
       ws: 8.21.3
     optionalDependencies:
-      '@modelcontextprotocol/sdk': 1.30.0(zod@4.1.8)
+      '@modelcontextprotocol/sdk': 1.31.0(zod@4.1.8)
     transitivePeerDependencies:
       - bufferutil
       - supports-color
@@ -2984,34 +2969,11 @@ snapshots:
 
   '@isaacs/string-locale-compare@1.1.0': {}
 
-  '@modelcontextprotocol/sdk@1.30.0(zod@4.1.8)':
+  '@modelcontextprotocol/sdk@1.31.0(zod@4.1.8)':
     dependencies:
       '@hono/node-server': 2.1.1(hono@4.13.8)
       ajv: 8.20.0
-      ajv-formats: 3.0.1(ajv@8.20.0)
-      content-type: 1.0.5
-      cors: 2.8.6
-      cross-spawn: 7.0.6
-      eventsource: 3.0.7
-      eventsource-parser: 3.1.1
-      express: 5.2.1
-      express-rate-limit: 8.7.0(express@5.2.1)
-      hono: 4.13.8
-      jose: 6.2.12
-      json-schema-typed: 8.0.2
-      pkce-challenge: 5.0.1
-      raw-body: 3.0.2
-      zod: 4.1.8
-      zod-to-json-schema: 3.25.2(zod@4.1.8)
-    transitivePeerDependencies:
-      - supports-color
-    optional: true
-
-  '@modelcontextprotocol/sdk@1.30.1(zod@4.1.8)':
-    dependencies:
-      '@hono/node-server': 2.1.1(hono@4.13.8)
-      ajv: 8.20.0
-      ajv-formats: 3.0.1(ajv@8.20.0)
+      ajv-formats: 3.0.1
       content-type: 1.0.5
       cors: 2.8.6
       cross-spawn: 7.0.6
@@ -3597,8 +3559,8 @@ snapshots:
 
   agent-base@9.0.0: {}
 
-  ajv-formats@3.0.1(ajv@8.20.0):
-    optionalDependencies:
+  ajv-formats@3.0.1:
+    dependencies:
       ajv: 8.20.0
 
   ajv@8.20.0:
