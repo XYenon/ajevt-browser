@@ -15,7 +15,7 @@ export function responseFor(
   request: any,
   operation: string,
   target?: string,
-  options: { confidence?: number; done?: number; stuck?: number; risky?: number } = {},
+  options: { confidence?: number; done?: number; stuck?: number } = {},
 ): JevResponse {
   const confidence = options.confidence ?? 0.95;
   const operationIds = Object.keys(request.questions.operation.criteria);
@@ -23,7 +23,6 @@ export function responseFor(
     operation: choice(operation, operationIds, confidence),
     goal_completed: { noul: options.done ?? 0.05 },
     stuck: { noul: options.stuck ?? 0.05 },
-    risky: { noul: options.risky ?? 0.05 },
   };
   for (const head of [
     "click_target",

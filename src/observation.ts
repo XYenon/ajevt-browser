@@ -1,5 +1,4 @@
 import { createHash } from "node:crypto";
-import { isRiskyActionLabel } from "./policy.js";
 import type { BrowserElement, Candidate, Observation, Operation } from "./types.js";
 
 const INTERACTIVE = new Set([
@@ -308,7 +307,6 @@ export function buildCandidates(
         operation: "CLICK",
         ref: element.ref,
         label: `Click ${label}`,
-        risky: isRiskyActionLabel(element.name),
       });
     }
   }

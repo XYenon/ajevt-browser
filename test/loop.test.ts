@@ -299,19 +299,7 @@ test("explicit Chinese control names receive strong relevance", () => {
   assert.equal(space.byOperation.get("CLICK")?.[0]?.ref, "@e2");
 });
 
-test("Chinese commitment buttons are marked risky", () => {
-  const page = observation({
-    elements: [
-      { ref: "@e1", role: "button", name: "确定" },
-      { ref: "@e2", role: "button", name: "取消" },
-    ],
-  });
-  const space = buildCandidates(page, "填写表单");
-  assert.equal(space.byOperation.get("CLICK")?.find((candidate) => candidate.ref === "@e1")?.risky, true);
-  assert.notEqual(space.byOperation.get("CLICK")?.find((candidate) => candidate.ref === "@e2")?.risky, true);
-});
-
-test("explicitly named risky action is intercepted before Jev", async () => {
+test("selected generic confirmation receives a second Jev check with the actual operation", async () => {
   const page = observation({
     elements: [
       { ref: "@e1", role: "button", name: "确定" },
@@ -319,21 +307,83 @@ test("explicitly named risky action is intercepted before Jev", async () => {
     ],
   });
   const browser = new FakeBrowser([page]);
-  const jev = new FakeJev((request) => responseFor(request, "BLOCKED"));
+  const jev = new FakeJev((request, index) =>
+    index === 0
+      ? responseFor(
+          request,
+          "CLICK",
+          request.questions.click_target
+            ? Object.keys(request.questions.click_target.criteria).find((id) =>
+                request.questions.click_target.criteria[id].includes("确定"),
+              )
+            : undefined,
+        )
+      : { answers: { risky: { noul: 0.9 } } },
+  );
   const result = await runBrowserLoop(browser, jev, { goal: "点击确定按钮", url: page.url });
   assert.equal(result.status, "needs_confirmation");
   assert.match(result.pending_action?.label ?? "", /确定/);
-  assert.equal(jev.calls.length, 0);
+  assert.equal(jev.calls.length, 2);
+  assert.equal(jev.calls[0].questions.risky, undefined);
+  assert.deepEqual(jev.calls[1].state.selected_action, {
+    operation: "CLICK",
+    label: result.pending_action?.label,
+    key: undefined,
+  });
   assert.equal(browser.actions.length, 0);
 });
 
 test("risky commitment returns needs_confirmation", async () => {
   const page = observation({ elements: [{ ref: "@e1", role: "button", name: "Send message" }] });
   const browser = new FakeBrowser([page]);
-  const jev = new FakeJev((request) => responseFor(request, "CLICK", undefined, { risky: 0.9 }));
+  const jev = new FakeJev((request) => responseFor(request, "CLICK"));
   const result = await runBrowserLoop(browser, jev, { goal: "send message", url: page.url });
   assert.equal(result.status, "needs_confirmation");
   assert.equal(browser.actions.length, 0);
+  assert.equal(jev.calls.length, 1);
+});
+
+test("safe selected control executes even when another offered control is destructive", async () => {
+  const page = observation({
+    elements: [
+      { ref: "@e1", role: "button", name: "Delete account" },
+      { ref: "@e2", role: "button", name: "Save filter" },
+    ],
+  });
+  const browser = new FakeBrowser([page]);
+  const jev = new FakeJev((request) =>
+    responseFor(
+      request,
+      "CLICK",
+      Object.keys(request.questions.click_target.criteria).find((id) =>
+        request.questions.click_target.criteria[id].includes("Save filter"),
+      ),
+    ),
+  );
+  await runBrowserLoop(browser, jev, { goal: "save filter", url: page.url, maxSteps: 1 });
+  assert.equal(browser.actions[0]?.ref, "@e2");
+  assert.equal(jev.calls.length, 1);
+});
+
+test("uncertain action uses selected-action risk check and fails closed on invalid response", async () => {
+  const page = observation({ elements: [{ ref: "@e1", role: "button", name: "Submit" }] });
+  const browser = new FakeBrowser([page]);
+  const jev = new FakeJev((request, index) => (index === 0 ? responseFor(request, "CLICK") : { answers: {} }));
+  const result = await runBrowserLoop(browser, jev, { goal: "continue", url: page.url });
+  assert.equal(result.status, "needs_confirmation");
+  assert.equal(result.pending_action?.ref, "@e1");
+  assert.equal(browser.actions.length, 0);
+});
+
+test("low post-selection risk score allows generic Save", async () => {
+  const page = observation({ elements: [{ ref: "@e1", role: "button", name: "Save" }] });
+  const browser = new FakeBrowser([page]);
+  const jev = new FakeJev((request, index) =>
+    index === 0 ? responseFor(request, "CLICK") : { answers: { risky: { noul: 0.1 } } },
+  );
+  await runBrowserLoop(browser, jev, { goal: "continue", url: page.url, maxSteps: 1 });
+  assert.equal(browser.actions[0]?.ref, "@e1");
+  assert.equal(jev.calls.length, 2);
 });
 
 test("text verifier does not pass solely because TYPE placed the text in an input", async () => {

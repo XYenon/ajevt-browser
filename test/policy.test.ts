@@ -1,15 +1,36 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { isRiskyActionLabel, requestsActionOnLabel } from "../src/policy.js";
+import { classifyActionRisk } from "../src/policy.js";
+import { observation } from "./helpers.js";
 
-test("policy centralizes multilingual risky action terms", () => {
-  for (const label of ["确定", "保存", "删除", "Submit", "Confirm order"])
-    assert.equal(isRiskyActionLabel(label), true);
-  for (const label of ["取消", "返回", "查看", "Search"]) assert.equal(isRiskyActionLabel(label), false);
+test("contextual risk distinguishes harmless controls from commitments", () => {
+  for (const [label, goal, expected] of [
+    ["Submit search", "search for a book", "safe"],
+    ["Save filter", "save the filter", "safe"],
+    ["Confirm selection", "confirm selection", "safe"],
+    ["Remove filter", "remove filter", "safe"],
+    ["提交搜索", "搜索图书", "safe"],
+    ["Submit application", "submit application", "risky"],
+    ["Confirm order", "confirm order", "risky"],
+    ["Remove account", "remove account", "risky"],
+    ["删除", "删除记录", "risky"],
+    ["Confirm", "confirm purchase", "risky"],
+    ["Save", "save", "uncertain"],
+    ["确定", "点击确定按钮", "uncertain"],
+  ] as const) {
+    const page = observation({ elements: [{ ref: "@e1", role: "button", name: label }] });
+    assert.equal(
+      classifyActionRisk({ id: "c1", operation: "CLICK", ref: "@e1", label: `Click button “${label}”` }, goal, page),
+      expected,
+      label,
+    );
+  }
 });
 
-test("action-to-label matching stays within one clause", () => {
-  assert.equal(requestsActionOnLabel("点击确定按钮", "确定"), true);
-  assert.equal(requestsActionOnLabel("点击取消，成功条件：确定按钮消失", "确定"), false);
-  assert.equal(requestsActionOnLabel("点击取消，成功条件：确定按钮消失", "取消"), true);
+test("generic confirmation on a checkout page remains risky", () => {
+  const page = observation({ title: "Checkout", elements: [{ ref: "@e1", role: "button", name: "Confirm" }] });
+  assert.equal(
+    classifyActionRisk({ id: "c1", operation: "CLICK", ref: "@e1", label: "Confirm" }, "continue", page),
+    "risky",
+  );
 });

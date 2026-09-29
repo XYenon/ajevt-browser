@@ -1,7 +1,7 @@
-import { decide } from "./decision.js";
+import { decide, validateNoul } from "./decision.js";
 import { matchesAllowedDomain } from "./domains.js";
 import { buildCandidates, type CandidateSpace, compactObservation } from "./observation.js";
-import { requestsActionOnLabel } from "./policy.js";
+import { classifyActionRisk } from "./policy.js";
 import type {
   BrowserAdapter,
   Candidate,
@@ -220,8 +220,7 @@ export async function runBrowserLoop(
         offered.operation === candidate.operation &&
         offered.ref === candidate.ref &&
         offered.option === candidate.option &&
-        offered.value === candidate.value &&
-        offered.risky === candidate.risky,
+        offered.value === candidate.value,
     );
     if (targetSurvives && stillOffered && staleReobserves >= staleReobserveLimit && fresh.url === decidedOn.url) {
       staleReobserves = 0;
@@ -361,25 +360,6 @@ export async function runBrowserLoop(
         if (boundary) return handoff(boundary.status, options, observation, history, {}, boundary.reason);
         continue;
       }
-      if (!options.allowRisky) {
-        const explicitRiskyMatches = (space.byOperation.get("CLICK") ?? []).filter((candidate) => {
-          if (!candidate.risky || !candidate.ref) return false;
-          const element = observation.elements.find((item) => item.ref === candidate.ref);
-          return element?.name ? requestsActionOnLabel(options.goal, element.name) : false;
-        });
-        if (explicitRiskyMatches.length === 1) {
-          const pending = explicitRiskyMatches[0];
-          return handoff(
-            "needs_confirmation",
-            options,
-            observation,
-            history,
-            { confidence: 1 },
-            "The explicitly requested action is destructive or creates an external commitment.",
-            { pending_action: { operation: pending.operation, ref: pending.ref, label: pending.label } },
-          );
-        }
-      }
       await options.onProgress?.({ step, phase: "deciding", url: observation.url });
       let decision: Decision;
       try {
@@ -461,7 +441,42 @@ export async function runBrowserLoop(
           },
         );
       }
-      if ((candidate.risky || decision.risky >= riskThreshold) && !options.allowRisky) {
+      const risk = classifyActionRisk(candidate, options.goal, observation);
+      let requiresConfirmation = risk === "risky";
+      if (risk === "uncertain" && !options.allowRisky) {
+        try {
+          const assessment = await jev.decide(
+            {
+              model: options.model ?? "jev-latest",
+              state: {
+                goal: options.goal,
+                page: { url: observation.url, title: observation.title, text: observation.text },
+                selected_action: { operation: candidate.operation, label: candidate.label, key: candidate.key },
+              },
+              questions: {
+                risky: {
+                  type: "noul",
+                  instructions:
+                    "Probability that this selected action creates an external commitment, sends data, or irreversibly removes something. Treat uncertainty as risk.",
+                },
+              },
+            },
+            options.signal,
+          );
+          requiresConfirmation = validateNoul(assessment.answers.risky, "risky") >= riskThreshold;
+        } catch (error) {
+          return handoff(
+            "needs_confirmation",
+            options,
+            observation,
+            history,
+            decision,
+            `Risk assessment failed; no action executed: ${error instanceof Error ? error.message : String(error)}`,
+            { pending_action: { operation: candidate.operation, ref: candidate.ref, label: candidate.label } },
+          );
+        }
+      }
+      if (requiresConfirmation && !options.allowRisky) {
         return handoff(
           "needs_confirmation",
           options,

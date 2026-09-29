@@ -56,7 +56,6 @@ export interface Candidate {
   option?: string;
   key?: string;
   direction?: "up" | "down";
-  risky?: boolean;
   secret?: boolean;
 }
 
@@ -81,7 +80,6 @@ export interface Decision {
   confidence: number;
   goalCompleted: number;
   stuck: number;
-  risky: number;
   raw: JevResponse;
 }
 

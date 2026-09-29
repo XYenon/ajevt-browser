@@ -80,11 +80,6 @@ export function buildDecisionRequest(
       instructions: "Probability that current observable page state proves the entire goal complete.",
     },
     stuck: { type: "noul", instructions: "Probability that progress is stuck or repeating." },
-    risky: {
-      type: "noul",
-      instructions:
-        "Probability that the selected next action creates an external commitment or destructive effect (pay, send, delete, publish, register, apply).",
-    },
   };
   const targetInstructions: Partial<Record<Operation, string>> = {
     CLICK: "If CLICK is chosen, select the best offered click candidate.",
@@ -150,7 +145,6 @@ export function resolveDecision(response: JevResponse, space: CandidateSpace): D
     confidence,
     goalCompleted: validateNoul(response.answers.goal_completed, "goal_completed"),
     stuck: validateNoul(response.answers.stuck, "stuck"),
-    risky: validateNoul(response.answers.risky, "risky"),
     raw: response,
   };
 }

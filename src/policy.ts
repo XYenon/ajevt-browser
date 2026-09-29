@@ -1,70 +1,29 @@
-const RISKY_ACTION_TERMS = [
-  "pay",
-  "purchase",
-  "buy",
-  "checkout",
-  "send",
-  "delete",
-  "remove",
-  "publish",
-  "register",
-  "apply",
-  "transfer",
-  "confirm order",
-  "place order",
-  "submit application",
-  "save",
-  "submit",
-  "confirm",
-  "支付",
-  "购买",
-  "结算",
-  "发送",
-  "删除",
-  "移除",
-  "发布",
-  "注册",
-  "申请",
-  "转账",
-  "保存",
-  "提交",
-  "确认",
-  "确定",
-] as const;
+import type { Candidate, Observation } from "./types.js";
 
-const ACTION_REQUEST_TERMS = ["click", "select", "execute", "点击", "选择", "执行"] as const;
+const COMMITMENT =
+  /\b(?:pay|payment|purchase|buy|checkout|send|delete|publish|register|apply|transfer|confirm order|place order|submit application|cancel subscription|close account|remove (?:account|user|member|payment|card))\b|支付|购买|结算|发送|删除|发布|注册|申请|转账|注销|付款/iu;
+const SAFE_ACTION =
+  /\b(?:submit (?:search|query)|save (?:filter|search|view|preference|draft)|confirm (?:selection|choice)|remove (?:filter|selection|tag))\b|提交搜索|保存(?:筛选|过滤|草稿)|确认(?:选择|选项)|移除(?:筛选|过滤|标签)/iu;
+const AMBIGUOUS_ACTION = /\b(?:save|submit|confirm|remove)\b|保存|提交|确认|确定|移除/iu;
 
-function escapeRegExp(value: string): string {
-  return value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-}
+export type RiskClassification = "safe" | "risky" | "uncertain";
 
-function termsPattern(terms: readonly string[]): RegExp {
-  const english: string[] = [];
-  const other: string[] = [];
-  for (const term of terms) {
-    const isAscii = [...term].every((character) => character.charCodeAt(0) <= 0x7f);
-    (isAscii ? english : other).push(escapeRegExp(term));
-  }
-  const parts = [
-    english.length ? `\\b(?:${english.join("|")})\\b` : "",
-    other.length ? `(?:${other.join("|")})` : "",
-  ].filter(Boolean);
-  return new RegExp(parts.join("|"), "iu");
-}
-
-const RISKY_ACTION_PATTERN = termsPattern(RISKY_ACTION_TERMS);
-export function isRiskyActionLabel(label: string): boolean {
-  return RISKY_ACTION_PATTERN.test(label);
-}
-
-export function requestsActionOnLabel(goal: string, label: string): boolean {
-  const normalizedLabel = label.trim();
-  if (!normalizedLabel) return false;
-  return goal
-    .split(/[。；;，,\n]/u)
-    .some(
-      (clause) =>
-        clause.toLowerCase().includes(normalizedLabel.toLowerCase()) &&
-        ACTION_REQUEST_TERMS.some((term) => clause.toLowerCase().includes(term.toLowerCase())),
-    );
+export function classifyActionRisk(candidate: Candidate, goal: string, observation: Observation): RiskClassification {
+  if (
+    candidate.operation === "TYPE" ||
+    candidate.operation === "SELECT" ||
+    candidate.operation === "SCROLL" ||
+    candidate.operation === "WAIT" ||
+    candidate.operation === "BACK"
+  )
+    return "safe";
+  const name = observation.elements.find((element) => element.ref === candidate.ref)?.name ?? candidate.label;
+  if (COMMITMENT.test(name)) return "risky";
+  if (COMMITMENT.test(goal) || COMMITMENT.test(observation.title)) return "risky";
+  if (SAFE_ACTION.test(name)) return "safe";
+  if (!AMBIGUOUS_ACTION.test(name) && !(candidate.operation === "PRESS" && candidate.key === "Enter")) return "safe";
+  // A generic confirmation or Enter key can submit the entire current form.
+  // Use the caller's purpose and page heading, not arbitrary untrusted body text.
+  if (/(?:search|query|filter|selection|choice|draft|搜索|查询|筛选|过滤|选择|草稿)/iu.test(goal)) return "safe";
+  return "uncertain";
 }
