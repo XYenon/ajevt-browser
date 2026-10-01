@@ -72,10 +72,10 @@
     }
   },
   "devDependencies": {
-    "@ampcode/plugin": "0.0.0-20260929001849-gc56b54d",
+    "@ampcode/plugin": "0.0.0-20260930001919-g9299b2d",
     "@biomejs/biome": "^2.5.14",
-    "@earendil-works/pi-coding-agent": "^0.87.0",
-    "@earendil-works/pi-tui": "^0.87.0",
+    "@earendil-works/pi-coding-agent": "^0.99.0",
+    "@earendil-works/pi-tui": "^0.99.0",
     "@opencode/plugin": "^2.0.14",
     "@types/node": "^24.13.6",
     "esbuild": "^0.28.2",
