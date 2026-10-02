@@ -75,7 +75,7 @@
     "@ampcode/plugin": "0.0.0-20261002001904-gdc609b2",
     "@biomejs/biome": "^2.5.14",
     "@earendil-works/pi-coding-agent": "^0.99.0",
-    "@earendil-works/pi-tui": "^0.99.0",
+    "@earendil-works/pi-tui": "^1.0.0",
     "@opencode/plugin": "^2.0.14",
     "@types/node": "^24.13.6",
     "esbuild": "^0.28.2",
