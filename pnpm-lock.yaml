@@ -9,8 +9,8 @@ importers:
   .:
     devDependencies:
       '@ampcode/plugin':
-        specifier: 0.0.0-20261001002205-g9c84ae8
-        version: 0.0.0-20261001002205-g9c84ae8
+        specifier: 0.0.0-20261002001904-gdc609b2
+        version: 0.0.0-20261002001904-gdc609b2
       '@biomejs/biome':
         specifier: ^2.5.14
         version: 2.5.15
@@ -25,7 +25,7 @@ importers:
         version: 2.0.21(@opentelemetry/semantic-conventions@1.43.0)(redis@6.2.1(@opentelemetry/api@1.9.0))
       '@types/node':
         specifier: ^24.13.6
-        version: 24.19.0
+        version: 24.19.1
       esbuild:
         specifier: ^0.28.2
         version: 0.28.2
@@ -59,7 +59,7 @@ importers:
     devDependencies:
       '@types/node':
         specifier: ^24.13.6
-        version: 24.19.0
+        version: 24.19.1
       typescript:
         specifier: ^7.0.2
         version: 7.0.2
@@ -70,8 +70,8 @@ packages:
     resolution: {integrity: sha512-oGMAgGoQdBXbZqNG0Ze56CHjDZ1IDYOwGYxYjO5KLSlz5HiNQ9udIXsPZ61VWaHGZ5XW/jyjmr6t2xz2jGVwbQ==}
     engines: {node: '>=18'}
 
-  '@ampcode/plugin@0.0.0-20261001002205-g9c84ae8':
-    resolution: {integrity: sha512-T8Py8PkaifdLUjOkBaqrKkUg0Vbb7Y+VGl1DfGzUfNZvcLBiPaOCDN0go2N6PkwS98POKfyd3eolAv/yXHGu/Q==}
+  '@ampcode/plugin@0.0.0-20261002001904-gdc609b2':
+    resolution: {integrity: sha512-zKYovVRSWaPuNpTiyhHG9TAwJ+KkmtAaZOUsoGC8BBiAiKpd8ZpI1gbT1d0Va5fgE8r67EtqIUsElHWvq283+Q==}
 
   '@anthropic-ai/sdk@0.124.0':
     resolution: {integrity: sha512-cN5O8i9UVxHeOQAzj/XjshWXG8KiibJDw9OGpH2Z/eR3n/RBxdoLxDJOcfqAJWvjaMDFfHTBADU04hWRJVkDyA==}
@@ -920,8 +920,8 @@ packages:
   '@types/ms@2.1.0':
     resolution: {integrity: sha512-GsCCIZDE/p3i96vtEqx+7dBUGXrc7zeSK3wwPHIaRThS+9OhWIXRqzs4d6k1SVU8g91DrNRWxWUGhp5KXQb2VA==}
 
-  '@types/node@24.19.0':
-    resolution: {integrity: sha512-zY+5tKxXdhGh1PYI0ac+7juvEu4OI6vWtVVoj5i2m42jxAY1U+zHGt6QCyOFwykdP62sM3MJ9stoYYUw5aCWew==}
+  '@types/node@24.19.1':
+    resolution: {integrity: sha512-aS3/DG0oM05K0RIXXP+hKjinGG5IgSSVGzswZxW3O0sS3pH4/fycXundUC9XsszgKCk4gHXylTEK6hyFxVxnoQ==}
 
   '@types/retry@0.12.0':
     resolution: {integrity: sha512-wWKOClTTiizcZhXnPY4wikVAwmdYHp8q6DmC+EJUzAMsycb7HB32Kh9RN4+0gExjmPmZSAQjgURXIGATPegAvA==}
@@ -2458,7 +2458,7 @@ snapshots:
     dependencies:
       json-schema: 0.4.0
 
-  '@ampcode/plugin@0.0.0-20261001002205-g9c84ae8': {}
+  '@ampcode/plugin@0.0.0-20261002001904-gdc609b2': {}
 
   '@anthropic-ai/sdk@0.124.0(zod@4.1.8)':
     dependencies:
@@ -3515,7 +3515,7 @@ snapshots:
 
   '@types/ms@2.1.0': {}
 
-  '@types/node@24.19.0':
+  '@types/node@24.19.1':
     dependencies:
       undici-types: 7.24.6
 
@@ -3525,7 +3525,7 @@ snapshots:
 
   '@types/ws@8.18.1':
     dependencies:
-      '@types/node': 24.19.0
+      '@types/node': 24.19.1
 
   '@typescript/typescript-aix-ppc64@7.0.2':
     optional: true
@@ -4810,7 +4810,7 @@ snapshots:
       '@protobufjs/path': 1.1.2
       '@protobufjs/pool': 1.1.0
       '@protobufjs/utf8': 1.1.2
-      '@types/node': 24.19.0
+      '@types/node': 24.19.1
       long: 5.3.2
 
   proxy-addr@2.0.8:
