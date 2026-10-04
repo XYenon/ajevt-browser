@@ -40,6 +40,8 @@ pi install npm:ajevt-browser
 pi -e npm:ajevt-browser   # try it without installing
 ```
 
+Pi 1.0.0 and newer can use its native Jev classifier and Pi-managed credentials. With no separate Jev HTTP credentials configured, the extension calls `modelRegistry.classify()` using `typesafe/jev-latest`. Configure the TypeSafe provider in Pi; no duplicate `decision.auth` is needed. See [native Pi configuration](#native-pi-classifiers) for other providers.
+
 ### OpenCode V2
 
 Add the package to `opencode.jsonc`. The package root exports the plugin:
@@ -121,12 +123,28 @@ Text verifiers read both the accessibility snapshot and the rendered page text, 
 
 ## Configuration
 
-Pi, OpenCode, Amp, and MCP use the same strict JSON configuration file:
+Pi, OpenCode, Amp, and MCP read the same strict JSON configuration file:
 
 ```text
 $XDG_CONFIG_HOME/ajevt-browser/config.json
 # or ~/.config/ajevt-browser/config.json when XDG_CONFIG_HOME is unset
 ```
+
+### Native Pi classifiers
+
+Run `/ajevt-model` in Pi's TUI to choose a native browser classifier from the providers with configured credentials. The menu shows provider/model IDs, including IDs containing slashes. This selection uses Pi's request-time provider authentication and takes priority over HTTP credentials configured for the shared transport.
+
+The selection is saved in the current Pi session branch and restored when resuming that session or navigating its branches. Choose **Default (HTTP config or TypeSafe Jev)** to clear it. In the default mode, Pi uses the shared HTTP transport when separate HTTP credentials are configured; otherwise it uses the native `typesafe/jev-latest` classifier.
+
+Configure native model credentials and provider-specific settings in Pi. Providers such as TypeSafe, OpenRouter, Cloudflare Workers AI, Vercel AI Gateway, and OpenCode can supply Jev classifiers. If the menu has no models, configure a classifier provider in Pi first.
+
+Native model selection is Pi session state, separate from the shared JSON configuration. `decision.model` and `JEV_MODEL` only select the model sent by the direct HTTP transport; they never select a native Pi model.
+
+Timeout, retries, and cancellation are passed to Pi's classifier API. Explicitly selected models use Pi's own provider credentials and headers. Native boolean answers are converted to the Jev probabilities used by the browser loop, including completion and risk checks. Missing models, authentication failures, and classifier errors are reported without silently changing providers.
+
+### Direct HTTP configuration
+
+OpenCode, Amp, and MCP use the direct Jev HTTP transport. In its default mode, Pi also uses it when `JEV_API_KEY`, `TYPESAFE_API_KEY`, or `decision.auth` is configured, including on older Pi versions. Custom endpoints require explicit HTTP credentials; the extension never forwards Pi-managed credentials to them. The current OpenCode and Amp plugin APIs do not expose Jev's structured state/questions classifier protocol.
 
 ```json
 {

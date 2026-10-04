@@ -3,7 +3,7 @@ import { homedir } from "node:os";
 import { isAbsolute, join } from "node:path";
 import type { JevConfig } from "./jev.js";
 
-const DEFAULT_ENDPOINT = "https://api.typesafe.ai/v1/systemone";
+export const DEFAULT_ENDPOINT = "https://api.typesafe.ai/v1/systemone";
 const MAX_SECRET_BYTES = 16 * 1024;
 const FORBIDDEN_HEADERS = new Set([
   "authorization",
@@ -32,6 +32,7 @@ export interface ResolveJevConfigOptions {
   env?: NodeJS.ProcessEnv;
   hostOptions?: unknown;
   userConfigPath?: string;
+  requireAuth?: boolean;
 }
 
 function object(value: unknown, source: string): Record<string, unknown> {
@@ -192,7 +193,13 @@ export function defaultUserConfigPath(env: NodeJS.ProcessEnv = process.env): str
   return join(env.XDG_CONFIG_HOME || join(homedir(), ".config"), "ajevt-browser", "config.json");
 }
 
-export function resolveJevConfig(options: ResolveJevConfigOptions = {}): JevConfig {
+export function resolveJevConfig(
+  options: ResolveJevConfigOptions & { requireAuth: false },
+): Omit<JevConfig, "apiKey"> & { apiKey?: string };
+export function resolveJevConfig(options?: ResolveJevConfigOptions & { requireAuth?: true }): JevConfig;
+export function resolveJevConfig(
+  options: ResolveJevConfigOptions = {},
+): Omit<JevConfig, "apiKey"> & { apiKey?: string } {
   const env = options.env ?? process.env;
   const explicitPath = env.AJEVT_BROWSER_CONFIG;
   if (explicitPath && !isAbsolute(explicitPath)) throw new Error("AJEVT_BROWSER_CONFIG must be an absolute path");
@@ -231,7 +238,7 @@ export function resolveJevConfig(options: ResolveJevConfigOptions = {}): JevConf
 
   const endpoint = merged.endpoint!;
   const url = new URL(endpoint);
-  if (!merged.auth)
+  if (!merged.auth && options.requireAuth !== false)
     throw new Error(
       "No Jev authentication configured. Set JEV_API_KEY (or TYPESAFE_API_KEY), or configure decision.auth",
     );
@@ -243,7 +250,7 @@ export function resolveJevConfig(options: ResolveJevConfigOptions = {}): JevConf
   }
   return {
     endpoint,
-    apiKey: resolveSecret(merged.auth, env, authSource ?? "configuration"),
+    apiKey: merged.auth ? resolveSecret(merged.auth, env, authSource ?? "configuration") : undefined,
     model: merged.model!,
     headers: resolveHeaders(merged.headers!, env, authSource ?? "configuration"),
     timeoutMs: merged.timeoutMs!,

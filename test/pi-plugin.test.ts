@@ -1,6 +1,7 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 import extension from "../extensions/index.js";
+import { selectedPiModel } from "../extensions/jev.js";
 import type { Handoff } from "../src/types.js";
 
 const theme = {
@@ -11,12 +12,73 @@ const theme = {
 function registeredTool(): any {
   let tool: unknown;
   extension({
+    registerCommand() {},
     registerTool(definition: unknown) {
       tool = definition;
     },
   } as never);
   return tool;
 }
+
+test("Pi model command selects authenticated classifiers and persists selection on the session branch", async () => {
+  let command: any;
+  const entries: any[] = [];
+  extension({
+    registerTool() {},
+    registerCommand(name: string, definition: unknown) {
+      assert.equal(name, "ajevt-model");
+      command = definition;
+    },
+    appendEntry(customType: string, data: unknown) {
+      entries.push({ type: "custom", customType, data });
+    },
+  } as never);
+  const models = [
+    { provider: "typesafe", id: "jev-latest" },
+    { provider: "cloudflare-workers-ai", id: "typesafe/jev" },
+  ];
+  let selection: string | undefined = "cloudflare-workers-ai/typesafe/jev";
+  const ctx = {
+    hasUI: true,
+    sessionManager: { getBranch: () => entries },
+    modelRegistry: {
+      async getAvailableOfType(type: string) {
+        assert.equal(type, "classifier");
+        return models;
+      },
+    },
+    ui: {
+      async select(title: string, options: string[]) {
+        const current = selectedPiModel(ctx as never);
+        assert.equal(title, `Browser classifier · ${current ? `${current.provider}/${current.id}` : "Default"}`);
+        assert.deepEqual(options, [
+          "Default (HTTP config or TypeSafe Jev)",
+          ...models.map((model) => `${model.provider}/${model.id}`),
+        ]);
+        return selection;
+      },
+      notify() {},
+    },
+  };
+  await command.handler("", ctx);
+  assert.deepEqual(selectedPiModel(ctx as never), models[1]);
+  const saved = [...entries];
+  entries.length = 0;
+  assert.equal(selectedPiModel(ctx as never), undefined);
+  entries.push(...saved);
+  assert.deepEqual(selectedPiModel(ctx as never), models[1]);
+
+  selection = undefined;
+  await command.handler("", ctx);
+  assert.equal(entries.length, 1);
+  assert.deepEqual(selectedPiModel(ctx as never), models[1]);
+
+  selection = "Default (HTTP config or TypeSafe Jev)";
+  await command.handler("", ctx);
+  assert.equal(entries.length, 2);
+  assert.equal(selectedPiModel(ctx as never), undefined);
+  assert.deepEqual(entries[1].data, { model: null });
+});
 
 function text(component: { render(width: number): string[] }): string {
   return component

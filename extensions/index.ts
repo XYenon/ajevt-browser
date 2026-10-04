@@ -4,6 +4,7 @@ import { Type } from "typebox";
 import { formatHandoff, HANDOFF_STATUS } from "../src/format.js";
 import { executeAjevtBrowser, SESSION_GUIDANCE, TOOL_DESCRIPTION, TOOL_NAME, type ToolProgress } from "../src/tool.js";
 import type { Handoff, HandoffStatus, Verifier } from "../src/types.js";
+import { registerPiModelCommand, resolvePiDecision, selectedPiModel } from "./jev.js";
 
 const verifier = Type.Union([
   Type.Object({ type: Type.Literal("url_contains"), text: Type.String() }),
@@ -92,6 +93,7 @@ function renderHandoff(
 }
 
 export default function (pi: ExtensionAPI) {
+  registerPiModelCommand(pi);
   pi.registerTool({
     name: TOOL_NAME,
     label: "Ajevt Browser",
@@ -151,11 +153,12 @@ export default function (pi: ExtensionAPI) {
         Type.Array(verifier, { description: "Deterministic completion checks. All must pass for status=done." }),
       ),
     }),
-    async execute(_toolCallId, params, signal, onUpdate) {
+    async execute(_toolCallId, params, signal, onUpdate, ctx) {
       const result = await executeAjevtBrowser(
         { ...params, verifiers: params.verifiers as Verifier[] | undefined },
         {
           signal,
+          decision: resolvePiDecision(ctx.modelRegistry, {}, selectedPiModel(ctx)),
           onProgress: (event) =>
             onUpdate?.({ content: [{ type: "text", text: progressLabel(event) }], details: event }),
         },
