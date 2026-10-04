@@ -1,6 +1,6 @@
 {
   "name": "ajevt-browser-mcp",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "stdio MCP server for ajevt-browser",
   "license": "AGPL-3.0-only",
   "type": "module",

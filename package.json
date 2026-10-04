@@ -1,6 +1,6 @@
 {
   "name": "ajevt-browser",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "A bounded Jev System-1 browser fast path for Pi, OpenCode V2, and MCP, powered exclusively by agent-browser",
   "license": "AGPL-3.0-only",
   "type": "module",
