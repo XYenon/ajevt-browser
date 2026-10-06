@@ -16,7 +16,7 @@ importers:
         version: 2.5.15
       '@earendil-works/pi-coding-agent':
         specifier: ^1.0.0
-        version: 1.0.3(@aws-sdk/credential-provider-node@3.972.83)(@modelcontextprotocol/sdk@1.32.0(zod@4.1.8))(@smithy/signature-v4@5.7.3)(ws@8.21.3)(zod@4.1.8)
+        version: 1.0.3(@aws-sdk/credential-provider-node@3.972.83)(@modelcontextprotocol/sdk@1.32.1(zod@4.1.8))(@smithy/signature-v4@5.7.3)(ws@8.21.3)(zod@4.1.8)
       '@earendil-works/pi-tui':
         specifier: ^1.0.0
         version: 1.0.3
@@ -49,7 +49,7 @@ importers:
     dependencies:
       '@modelcontextprotocol/sdk':
         specifier: ^1.30.0
-        version: 1.32.0(zod@4.1.8)
+        version: 1.32.1(zod@4.1.8)
       ajevt-browser:
         specifier: workspace:*
         version: link:../..
@@ -521,8 +521,8 @@ packages:
   '@isaacs/string-locale-compare@1.1.0':
     resolution: {integrity: sha512-SQ7Kzhh9+D+ZW9MA0zkYv3VXhIDNx+LzM6EJ+/65I3QY+enU6Itte7E5XX7EWrqLW2FN4n06GWzBnPoC3th2aQ==}
 
-  '@modelcontextprotocol/sdk@1.32.0':
-    resolution: {integrity: sha512-8BviX/hK4Gd2eL1KdTwm0gfl4d3wdoErW0Jd00h6nomUAtk6IJk5vwQJc6kfWtJTzN5OEV/lgIiJKI8fiDGAlA==}
+  '@modelcontextprotocol/sdk@1.32.1':
+    resolution: {integrity: sha512-2DdE+SJDtzLEEWzY1ZjY7Q+VcPhcV1KisD3zI4u0XZyktsjHum1mwbMI+JaulUBi2OZk+KJAi2uPXzxichPkdw==}
     engines: {node: '>=18'}
     peerDependencies:
       '@cfworker/json-schema': ^4.1.1
@@ -2767,9 +2767,9 @@ snapshots:
     dependencies:
       esbuild: 0.28.2
 
-  '@earendil-works/pi-agent-core@1.0.3(@aws-sdk/credential-provider-node@3.972.83)(@modelcontextprotocol/sdk@1.32.0(zod@4.1.8))(@smithy/signature-v4@5.7.3)(undici@8.10.2)(ws@8.21.3)(zod@4.1.8)':
+  '@earendil-works/pi-agent-core@1.0.3(@aws-sdk/credential-provider-node@3.972.83)(@modelcontextprotocol/sdk@1.32.1(zod@4.1.8))(@smithy/signature-v4@5.7.3)(undici@8.10.2)(ws@8.21.3)(zod@4.1.8)':
     dependencies:
-      '@earendil-works/pi-ai': 1.0.3(@aws-sdk/credential-provider-node@3.972.83)(@modelcontextprotocol/sdk@1.32.0(zod@4.1.8))(@smithy/signature-v4@5.7.3)(undici@8.10.2)(ws@8.21.3)(zod@4.1.8)
+      '@earendil-works/pi-ai': 1.0.3(@aws-sdk/credential-provider-node@3.972.83)(@modelcontextprotocol/sdk@1.32.1(zod@4.1.8))(@smithy/signature-v4@5.7.3)(undici@8.10.2)(ws@8.21.3)(zod@4.1.8)
       typebox: 1.3.27
     transitivePeerDependencies:
       - '@aws-sdk/credential-provider-node'
@@ -2784,12 +2784,12 @@ snapshots:
       - ws
       - zod
 
-  '@earendil-works/pi-ai@1.0.3(@aws-sdk/credential-provider-node@3.972.83)(@modelcontextprotocol/sdk@1.32.0(zod@4.1.8))(@smithy/signature-v4@5.7.3)(undici@8.10.2)(ws@8.21.3)(zod@4.1.8)':
+  '@earendil-works/pi-ai@1.0.3(@aws-sdk/credential-provider-node@3.972.83)(@modelcontextprotocol/sdk@1.32.1(zod@4.1.8))(@smithy/signature-v4@5.7.3)(undici@8.10.2)(ws@8.21.3)(zod@4.1.8)':
     dependencies:
       '@anthropic-ai/sdk': 0.129.0(zod@4.1.8)
       '@aws-sdk/client-bedrock-runtime': 3.1127.0
       '@earendil-works/pi-telemetry': 1.0.3
-      '@google/genai': 2.21.0(@modelcontextprotocol/sdk@1.32.0(zod@4.1.8))
+      '@google/genai': 2.21.0(@modelcontextprotocol/sdk@1.32.1(zod@4.1.8))
       '@smithy/node-http-handler': 4.12.1
       http-proxy-agent: 9.1.0
       https-proxy-agent: 9.1.0
@@ -2813,11 +2813,11 @@ snapshots:
     dependencies:
       quickjs-wasi: 3.6.2
 
-  '@earendil-works/pi-coding-agent@1.0.3(@aws-sdk/credential-provider-node@3.972.83)(@modelcontextprotocol/sdk@1.32.0(zod@4.1.8))(@smithy/signature-v4@5.7.3)(ws@8.21.3)(zod@4.1.8)':
+  '@earendil-works/pi-coding-agent@1.0.3(@aws-sdk/credential-provider-node@3.972.83)(@modelcontextprotocol/sdk@1.32.1(zod@4.1.8))(@smithy/signature-v4@5.7.3)(ws@8.21.3)(zod@4.1.8)':
     dependencies:
       '@earendil-works/chord': 1.0.3
-      '@earendil-works/pi-agent-core': 1.0.3(@aws-sdk/credential-provider-node@3.972.83)(@modelcontextprotocol/sdk@1.32.0(zod@4.1.8))(@smithy/signature-v4@5.7.3)(undici@8.10.2)(ws@8.21.3)(zod@4.1.8)
-      '@earendil-works/pi-ai': 1.0.3(@aws-sdk/credential-provider-node@3.972.83)(@modelcontextprotocol/sdk@1.32.0(zod@4.1.8))(@smithy/signature-v4@5.7.3)(undici@8.10.2)(ws@8.21.3)(zod@4.1.8)
+      '@earendil-works/pi-agent-core': 1.0.3(@aws-sdk/credential-provider-node@3.972.83)(@modelcontextprotocol/sdk@1.32.1(zod@4.1.8))(@smithy/signature-v4@5.7.3)(undici@8.10.2)(ws@8.21.3)(zod@4.1.8)
+      '@earendil-works/pi-ai': 1.0.3(@aws-sdk/credential-provider-node@3.972.83)(@modelcontextprotocol/sdk@1.32.1(zod@4.1.8))(@smithy/signature-v4@5.7.3)(undici@8.10.2)(ws@8.21.3)(zod@4.1.8)
       '@earendil-works/pi-codemode': 1.0.3
       '@earendil-works/pi-mcp': 1.0.3
       '@earendil-works/pi-tui': 1.0.3
@@ -2974,14 +2974,14 @@ snapshots:
 
   '@gar/promise-retry@1.0.3': {}
 
-  '@google/genai@2.21.0(@modelcontextprotocol/sdk@1.32.0(zod@4.1.8))':
+  '@google/genai@2.21.0(@modelcontextprotocol/sdk@1.32.1(zod@4.1.8))':
     dependencies:
       google-auth-library: 10.9.1
       p-retry: 4.6.2
       protobufjs: 7.6.6
       ws: 8.21.3
     optionalDependencies:
-      '@modelcontextprotocol/sdk': 1.32.0(zod@4.1.8)
+      '@modelcontextprotocol/sdk': 1.32.1(zod@4.1.8)
     transitivePeerDependencies:
       - bufferutil
       - supports-color
@@ -3006,7 +3006,7 @@ snapshots:
 
   '@isaacs/string-locale-compare@1.1.0': {}
 
-  '@modelcontextprotocol/sdk@1.32.0(zod@4.1.8)':
+  '@modelcontextprotocol/sdk@1.32.1(zod@4.1.8)':
     dependencies:
       '@hono/node-server': 2.1.1(hono@4.13.8)
       ajv: 8.20.0
