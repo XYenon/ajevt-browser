@@ -9,8 +9,8 @@ importers:
   .:
     devDependencies:
       '@ampcode/plugin':
-        specifier: 0.0.0-20261010002032-ge25e839
-        version: 0.0.0-20261010002032-ge25e839
+        specifier: 0.0.0-20261010103843-g390d027
+        version: 0.0.0-20261010103843-g390d027
       '@biomejs/biome':
         specifier: ^2.5.14
         version: 2.5.15
@@ -34,7 +34,7 @@ importers:
         version: 0.23.3
       prettier:
         specifier: ^3.9.8
-        version: 3.9.9
+        version: 3.9.10
       tsx:
         specifier: ^4.23.15
         version: 4.23.15
@@ -70,8 +70,8 @@ packages:
     resolution: {integrity: sha512-oGMAgGoQdBXbZqNG0Ze56CHjDZ1IDYOwGYxYjO5KLSlz5HiNQ9udIXsPZ61VWaHGZ5XW/jyjmr6t2xz2jGVwbQ==}
     engines: {node: '>=18'}
 
-  '@ampcode/plugin@0.0.0-20261010002032-ge25e839':
-    resolution: {integrity: sha512-SiYkyVrNQ4WAHMGXFbUkZM8Jich28dtBw4N+nIbjqUjUCQ73FWClJBdhv4HXb76iDASK80t9wOIs/VMgv5XJPQ==}
+  '@ampcode/plugin@0.0.0-20261010103843-g390d027':
+    resolution: {integrity: sha512-KVtA3kQUrfWGNiSU/3Tlv5LrkzcrZPmBzKNUMKaeTXuIipWGUwoJ1QJM2H7AflR2byxF85DeC+cTE6gWJicw4A==}
 
   '@anthropic-ai/sdk@0.129.0':
     resolution: {integrity: sha512-MH7LB20kNpGLUpPTe2OG5XvL/KhX8HUO9XyBaFjgFk6TLS4Xjt0VPIuMKywe7POKKPslX+QxSlVok9e+8kG5Nw==}
@@ -2080,8 +2080,8 @@ packages:
     resolution: {integrity: sha512-C+y9x90UElAddDZmV4qOx9W53B61PO7cIqWz2dQsWlwswuq4mr8NEwytdGKboYbQlGZ3awrkTeNvcZiZNHnQ8A==}
     engines: {node: '>=20'}
 
-  prettier@3.9.9:
-    resolution: {integrity: sha512-Z/CJHIkdujO/OtN7nXUii0Rf3VT5SRuhjBA82Xvu2XhBUgX3nhP67T0LHceBdQLex7OOFGTox+Q5Yg8Jk2Qivg==}
+  prettier@3.9.10:
+    resolution: {integrity: sha512-skGHTH1Yb9QvaTC4hWnRTzEYtCpApF0UMBPz+t/0ZPzP8ihefo/btKd+QA7pUE0fEwA1SbS/NmhyEcstdXOIdA==}
     engines: {node: '>=14'}
     hasBin: true
 
@@ -2458,7 +2458,7 @@ snapshots:
     dependencies:
       json-schema: 0.4.0
 
-  '@ampcode/plugin@0.0.0-20261010002032-ge25e839': {}
+  '@ampcode/plugin@0.0.0-20261010103843-g390d027': {}
 
   '@anthropic-ai/sdk@0.129.0(zod@4.1.8)':
     dependencies:
@@ -4777,7 +4777,7 @@ snapshots:
 
   powershell-utils@0.2.1: {}
 
-  prettier@3.9.9: {}
+  prettier@3.9.10: {}
 
   proc-log@6.1.0: {}
 
