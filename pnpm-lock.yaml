@@ -9,20 +9,20 @@ importers:
   .:
     devDependencies:
       '@ampcode/plugin':
-        specifier: 0.0.0-20261015001659-g73eff93
-        version: 0.0.0-20261015001659-g73eff93
+        specifier: 0.0.0-20261016001627-gab25fd2
+        version: 0.0.0-20261016001627-gab25fd2
       '@biomejs/biome':
         specifier: ^2.5.14
         version: 2.5.15
       '@earendil-works/pi-coding-agent':
         specifier: ^1.0.0
-        version: 1.2.0(@aws-sdk/credential-provider-node@3.972.83)(@modelcontextprotocol/sdk@1.32.1(zod@4.1.8))(@smithy/signature-v4@5.7.3)(ws@8.22.0)(zod@4.1.8)
+        version: 1.3.0(@aws-sdk/credential-provider-node@3.972.83)(@modelcontextprotocol/sdk@1.32.1(zod@4.1.8))(@smithy/signature-v4@5.7.3)(ws@8.22.0)(zod@4.1.8)
       '@earendil-works/pi-tui':
         specifier: ^1.0.0
-        version: 1.2.0
+        version: 1.3.0
       '@opencode/plugin':
         specifier: ^2.0.14
-        version: 2.0.29(@opentelemetry/semantic-conventions@1.43.0)(redis@6.2.1(@opentelemetry/api@1.9.0))
+        version: 2.0.30(@opentelemetry/semantic-conventions@1.43.0)(redis@6.2.1(@opentelemetry/api@1.9.0))
       '@types/node':
         specifier: ^24.13.6
         version: 24.19.2
@@ -70,8 +70,8 @@ packages:
     resolution: {integrity: sha512-oGMAgGoQdBXbZqNG0Ze56CHjDZ1IDYOwGYxYjO5KLSlz5HiNQ9udIXsPZ61VWaHGZ5XW/jyjmr6t2xz2jGVwbQ==}
     engines: {node: '>=18'}
 
-  '@ampcode/plugin@0.0.0-20261015001659-g73eff93':
-    resolution: {integrity: sha512-fh79df1ruWq4np1NAtVBCbyUQkoFa0bhS6n8OBxEqJXligDhYyDz4jKhEnPO8W2oDkvihh5CdU9hvbnENGSFww==}
+  '@ampcode/plugin@0.0.0-20261016001627-gab25fd2':
+    resolution: {integrity: sha512-EM6a6D1GUtL5vKecBoX2d/2YkS1j1Jjuv8nbuaFA8wie0fSSEsD91N7meFiKV05cIKhg83bOILz47fF8l09b/g==}
 
   '@anthropic-ai/sdk@0.129.0':
     resolution: {integrity: sha512-MH7LB20kNpGLUpPTe2OG5XvL/KhX8HUO9XyBaFjgFk6TLS4Xjt0VPIuMKywe7POKKPslX+QxSlVok9e+8kG5Nw==}
@@ -256,34 +256,34 @@ packages:
     cpu: [x64]
     os: [win32]
 
-  '@earendil-works/pi-agent-core@1.2.0':
-    resolution: {integrity: sha512-pUR0vYmGhHkBQGeCeWjwVIA+l1+MrDu6m6VGuysjh6KBzBpovTV/MlcVrEIOaM8jv/slpAyUmuCEQl1jOBqHJQ==}
+  '@earendil-works/pi-agent-core@1.3.0':
+    resolution: {integrity: sha512-2jvpxZs47PFD5mSQb/yK0pGHJ5yO7Nu22u9mFjHbSLRgu62vZ9rupimDSIp4arnqOadyv0AWvYHtCSpFoJV7ag==}
     engines: {node: '>=22.19.0'}
 
-  '@earendil-works/pi-ai@1.2.0':
-    resolution: {integrity: sha512-U5/1zXqfV1on7/9sbez03tT4Ru49Lvfb4+zXSDK3DBKF5cRk6KxvAOTOY3HJ4jimlZth+rs7vbJqN6iBQAoNuQ==}
-    engines: {node: '>=22.19.0'}
-    hasBin: true
-
-  '@earendil-works/pi-codemode@1.2.0':
-    resolution: {integrity: sha512-UZF7IN0IIrf3bop2wTxrwoAakGctH6d3zdPwhPN+QHMECfoI5E6B6l6I17YGFZPj8cmGex6xX7mLCNJXRf7wsw==}
-    engines: {node: '>=22.19.0'}
-
-  '@earendil-works/pi-coding-agent@1.2.0':
-    resolution: {integrity: sha512-h/4WaVWv1VlCaY8x8qEN5U+7jbF/e7+Ck6moPeEOFn5juMTWwNAXjwgYM7gRgbBYh8Zppwt6qWvJDzNTf4GNEQ==}
+  '@earendil-works/pi-ai@1.3.0':
+    resolution: {integrity: sha512-KaBI8x7q7sPoFUXICNGD9efHzDG+oRNwVvkA9jdIsSQWH1RjFssOlEGsbLtewUPPgCrvmz0l2KTgSLXTyj3acw==}
     engines: {node: '>=22.19.0'}
     hasBin: true
 
-  '@earendil-works/pi-mcp@1.2.0':
-    resolution: {integrity: sha512-ertUv40rUBgssTzw2lIPlejjIBdhvdg4uw+whWCDJYKYHU+ldp1ezhbB0BzwpBfnwef6/YN+m6eKLscj+r3p7w==}
+  '@earendil-works/pi-codemode@1.3.0':
+    resolution: {integrity: sha512-2G9tmbsPhgzwfz7cmzJpbLSLqOx3eu22Gbzm+Wc3HqeZMjLQS4F3KfAabozVhv7uEjq3k2O1dZTHmhhWr2xbfQ==}
     engines: {node: '>=22.19.0'}
 
-  '@earendil-works/pi-telemetry@1.2.0':
-    resolution: {integrity: sha512-NZ3aJE6dr7aTgzzXDe53OW7BsAsF8ZUKHPJTtnjaQcxtlagkUT0Ew8Qas0EvYQsZqR/KpF1lB+z209XBzIC7xg==}
+  '@earendil-works/pi-coding-agent@1.3.0':
+    resolution: {integrity: sha512-V/WoCjA2hQSe3QLWIUB24cTRdtEdeLiIzkDqU5RMXV6VWuD+KGZnzVBMhglwdnQTySkehZsjt8a3g6Jd2g4nnw==}
+    engines: {node: '>=22.19.0'}
+    hasBin: true
+
+  '@earendil-works/pi-mcp@1.3.0':
+    resolution: {integrity: sha512-lbktLplmdGamM2t460Q0ziNEfpUEHDTVNf79g/AialJ3XZ+SHgNqa/OJXRR+fU+GV/l+gBhRPcyP8XkQlv8Avw==}
     engines: {node: '>=22.19.0'}
 
-  '@earendil-works/pi-tui@1.2.0':
-    resolution: {integrity: sha512-OdJCiYklkL3TqmdmGKUflHoLy9zw18GBYO0DPASZvGlP4RkDXAZzLLDt7cidJ6wUR7DBrKb13rrekDsXgMF60g==}
+  '@earendil-works/pi-telemetry@1.3.0':
+    resolution: {integrity: sha512-ERGZr+aXjNJzoUbB7ZzHVH3g5otzMHjHLs2Fyizm12By5X+gBEhod9cJXFOk13S7M8a29Am+Mq21zm73mRJFLg==}
+    engines: {node: '>=22.19.0'}
+
+  '@earendil-works/pi-tui@1.3.0':
+    resolution: {integrity: sha512-AlKvEwEWyVtnuw7SVb4N/mUhlfIohyFslUNWarZVdLHHSdt3ca5EhMLwTzblBpDpaofSz+f+tAHie6CfxVrWKA==}
     engines: {node: '>=22.19.0'}
 
   '@effect/opentelemetry@4.0.1':
@@ -601,11 +601,11 @@ packages:
     resolution: {integrity: sha512-mGUWr1uMnf0le2TwfOZY4SFxZGXGfm4Jtay/nwAa2FLNAKXUoUwaGwBMNH36UHPtinWfTSJ3nqFQr0091CxVGg==}
     engines: {node: ^20.17.0 || >=22.9.0}
 
-  '@opencode/ai@2.0.29':
-    resolution: {integrity: sha512-Hu5U8FadWuI+do1ToBj9bhEL2wfP01JUaOWq8S6JaeHRaXcjvdsuCCFlGUtlA9PMn084gP4ewdInYPIv0B/98w==}
+  '@opencode/ai@2.0.30':
+    resolution: {integrity: sha512-N+P3qE9qIaBvO9qM+aQPr8T8yjpUGG7QIuHvl59AAIa2FXgGhqfMRq3o6zlFB9B2cvavsHEXKPWuqxIP2MHPXg==}
 
-  '@opencode/client@2.0.29':
-    resolution: {integrity: sha512-fxjzqFAXEGiMDCzCfuKPyZbmrLQAwv0JQIi2rXfrjh3uE3UvItfqPjsiW1/sVPncJvu4UiRXHi+/0ksv3uHDPA==}
+  '@opencode/client@2.0.30':
+    resolution: {integrity: sha512-KUglC9ak8mhLDC84247i+laGVExvYQKrcMjkOozP9FOyMSHLh/o9fVDb85I6SD6lTM0mtexljXcZi6AbHEfvOQ==}
     peerDependencies:
       effect: 4.0.1
       solid-js: '>=1.9.0'
@@ -615,10 +615,10 @@ packages:
       solid-js:
         optional: true
 
-  '@opencode/plugin@2.0.29':
-    resolution: {integrity: sha512-ZK1oUWrHl8u/9pt7lEJVDNKhhXQWMdHvaUuQ/96o9tDbbN+XaYTe4p6gt86F5bm0w9YgspE3TEX9WriI402Pbw==}
+  '@opencode/plugin@2.0.30':
+    resolution: {integrity: sha512-/69jdd7+RgaiXV5EE+2OepGy+edjbCuOWtdvtfcqZT9LCoZNTkl3a4T6oO2x9PDXznekBpmhahxHCf7zbaN16g==}
     peerDependencies:
-      '@opencode/theme': 2.0.29
+      '@opencode/theme': 2.0.30
       '@opentui/core': '>=0.5.17'
       '@opentui/solid': '>=0.5.17'
       solid-js: '>=1.9.0'
@@ -632,14 +632,14 @@ packages:
       solid-js:
         optional: true
 
-  '@opencode/protocol@2.0.29':
-    resolution: {integrity: sha512-Eik6a2u2znmWdyPgpxCnMXJXySslG0Yj/XQzmM/Z/3pAxy0nMJnKLaFznnvXPNoPPII14L+CH7kUhBjLtOPGgQ==}
+  '@opencode/protocol@2.0.30':
+    resolution: {integrity: sha512-2iHVE4z3iDBEW0JCV8K9xlNshO0x5Ers+xxlPrFS+51S+iA4dUdH8gi497PToBdmQHL94FOD8CHcND/QYxDAhA==}
 
-  '@opencode/schema@2.0.29':
-    resolution: {integrity: sha512-2qSyUGaeItugP3QujZrBhg2f4a4wdL9ab0m0fObHM+hlZ659YmWGzBRNI9qWR7At8AI9gnDCmgnnrQrx5/aprg==}
+  '@opencode/schema@2.0.30':
+    resolution: {integrity: sha512-Yqe2bJHBZRxp+BsZrGhoqvtn5QQ6HTYu8mZ/VhfsTqbQYiLgr25a2bFB2OVqZXHqBFjyOBDxgpXQYSThw14a5w==}
 
-  '@opencode/util@2.0.29':
-    resolution: {integrity: sha512-o0xmrV5MFzB4hhapow4tSbStXAWF27598tDabqq+damJAuvPCBGorDBciosenXpOnNsEHhJm37l5KwOhb1+SNA==}
+  '@opencode/util@2.0.30':
+    resolution: {integrity: sha512-ILp5NtoQ1gV6X3STigjYRIChu8Ia7ApSNtCE52TFP53gYNs9M2D+3+7Mq+uxcfqInEL/fwav5lMayDbOUgvCSQ==}
 
   '@opentelemetry/api-logs@0.219.0':
     resolution: {integrity: sha512-FFx7YnaYJlIjqWW/AG/yAZ0L/NEY724PipXXXQLdtZPbLwBGbUMTGL1i/esI56TWfTUXxhLfpgrnWJCG8aUJyg==}
@@ -2401,7 +2401,7 @@ snapshots:
     dependencies:
       json-schema: 0.4.0
 
-  '@ampcode/plugin@0.0.0-20261015001659-g73eff93': {}
+  '@ampcode/plugin@0.0.0-20261016001627-gab25fd2': {}
 
   '@anthropic-ai/sdk@0.129.0(zod@4.1.8)':
     dependencies:
@@ -2706,9 +2706,9 @@ snapshots:
   '@biomejs/cli-win32-x64@2.5.15':
     optional: true
 
-  '@earendil-works/pi-agent-core@1.2.0(@aws-sdk/credential-provider-node@3.972.83)(@modelcontextprotocol/sdk@1.32.1(zod@4.1.8))(@smithy/signature-v4@5.7.3)(undici@8.10.2)(ws@8.22.0)(zod@4.1.8)':
+  '@earendil-works/pi-agent-core@1.3.0(@aws-sdk/credential-provider-node@3.972.83)(@modelcontextprotocol/sdk@1.32.1(zod@4.1.8))(@smithy/signature-v4@5.7.3)(undici@8.10.2)(ws@8.22.0)(zod@4.1.8)':
     dependencies:
-      '@earendil-works/pi-ai': 1.2.0(@aws-sdk/credential-provider-node@3.972.83)(@modelcontextprotocol/sdk@1.32.1(zod@4.1.8))(@smithy/signature-v4@5.7.3)(undici@8.10.2)(ws@8.22.0)(zod@4.1.8)
+      '@earendil-works/pi-ai': 1.3.0(@aws-sdk/credential-provider-node@3.972.83)(@modelcontextprotocol/sdk@1.32.1(zod@4.1.8))(@smithy/signature-v4@5.7.3)(undici@8.10.2)(ws@8.22.0)(zod@4.1.8)
       typebox: 1.3.27
     transitivePeerDependencies:
       - '@aws-sdk/credential-provider-node'
@@ -2723,11 +2723,11 @@ snapshots:
       - ws
       - zod
 
-  '@earendil-works/pi-ai@1.2.0(@aws-sdk/credential-provider-node@3.972.83)(@modelcontextprotocol/sdk@1.32.1(zod@4.1.8))(@smithy/signature-v4@5.7.3)(undici@8.10.2)(ws@8.22.0)(zod@4.1.8)':
+  '@earendil-works/pi-ai@1.3.0(@aws-sdk/credential-provider-node@3.972.83)(@modelcontextprotocol/sdk@1.32.1(zod@4.1.8))(@smithy/signature-v4@5.7.3)(undici@8.10.2)(ws@8.22.0)(zod@4.1.8)':
     dependencies:
       '@anthropic-ai/sdk': 0.129.0(zod@4.1.8)
       '@aws-sdk/client-bedrock-runtime': 3.1127.0
-      '@earendil-works/pi-telemetry': 1.2.0
+      '@earendil-works/pi-telemetry': 1.3.0
       '@google/genai': 2.21.0(@modelcontextprotocol/sdk@1.32.1(zod@4.1.8))
       '@smithy/node-http-handler': 4.12.1
       http-proxy-agent: 9.1.0
@@ -2748,17 +2748,17 @@ snapshots:
       - ws
       - zod
 
-  '@earendil-works/pi-codemode@1.2.0':
+  '@earendil-works/pi-codemode@1.3.0':
     dependencies:
       quickjs-wasi: 3.6.2
 
-  '@earendil-works/pi-coding-agent@1.2.0(@aws-sdk/credential-provider-node@3.972.83)(@modelcontextprotocol/sdk@1.32.1(zod@4.1.8))(@smithy/signature-v4@5.7.3)(ws@8.22.0)(zod@4.1.8)':
+  '@earendil-works/pi-coding-agent@1.3.0(@aws-sdk/credential-provider-node@3.972.83)(@modelcontextprotocol/sdk@1.32.1(zod@4.1.8))(@smithy/signature-v4@5.7.3)(ws@8.22.0)(zod@4.1.8)':
     dependencies:
-      '@earendil-works/pi-agent-core': 1.2.0(@aws-sdk/credential-provider-node@3.972.83)(@modelcontextprotocol/sdk@1.32.1(zod@4.1.8))(@smithy/signature-v4@5.7.3)(undici@8.10.2)(ws@8.22.0)(zod@4.1.8)
-      '@earendil-works/pi-ai': 1.2.0(@aws-sdk/credential-provider-node@3.972.83)(@modelcontextprotocol/sdk@1.32.1(zod@4.1.8))(@smithy/signature-v4@5.7.3)(undici@8.10.2)(ws@8.22.0)(zod@4.1.8)
-      '@earendil-works/pi-codemode': 1.2.0
-      '@earendil-works/pi-mcp': 1.2.0
-      '@earendil-works/pi-tui': 1.2.0
+      '@earendil-works/pi-agent-core': 1.3.0(@aws-sdk/credential-provider-node@3.972.83)(@modelcontextprotocol/sdk@1.32.1(zod@4.1.8))(@smithy/signature-v4@5.7.3)(undici@8.10.2)(ws@8.22.0)(zod@4.1.8)
+      '@earendil-works/pi-ai': 1.3.0(@aws-sdk/credential-provider-node@3.972.83)(@modelcontextprotocol/sdk@1.32.1(zod@4.1.8))(@smithy/signature-v4@5.7.3)(undici@8.10.2)(ws@8.22.0)(zod@4.1.8)
+      '@earendil-works/pi-codemode': 1.3.0
+      '@earendil-works/pi-mcp': 1.3.0
+      '@earendil-works/pi-tui': 1.3.0
       '@silvia-odwyer/photon-node': 0.3.4
       brace-expansion: 5.0.12
       chalk: 6.0.0
@@ -2788,13 +2788,13 @@ snapshots:
       - ws
       - zod
 
-  '@earendil-works/pi-mcp@1.2.0':
+  '@earendil-works/pi-mcp@1.3.0':
     dependencies:
       cross-spawn: 7.0.6
 
-  '@earendil-works/pi-telemetry@1.2.0': {}
+  '@earendil-works/pi-telemetry@1.3.0': {}
 
-  '@earendil-works/pi-tui@1.2.0':
+  '@earendil-works/pi-tui@1.3.0':
     dependencies:
       get-east-asian-width: 1.6.0
       marked: 18.0.11
@@ -3105,10 +3105,10 @@ snapshots:
       node-gyp: 12.4.0
       proc-log: 6.1.0
 
-  '@opencode/ai@2.0.29':
+  '@opencode/ai@2.0.30':
     dependencies:
       '@aws-sdk/credential-providers': 3.1057.0
-      '@opencode/schema': 2.0.29
+      '@opencode/schema': 2.0.30
       '@smithy/eventstream-codec': 4.2.14
       '@smithy/util-utf8': 4.2.2
       aws4fetch: 1.0.20
@@ -3117,21 +3117,21 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  '@opencode/client@2.0.29(effect@4.0.1)':
+  '@opencode/client@2.0.30(effect@4.0.1)':
     dependencies:
-      '@opencode/protocol': 2.0.29
-      '@opencode/schema': 2.0.29
+      '@opencode/protocol': 2.0.30
+      '@opencode/schema': 2.0.30
     optionalDependencies:
       effect: 4.0.1
 
-  '@opencode/plugin@2.0.29(@opentelemetry/semantic-conventions@1.43.0)(redis@6.2.1(@opentelemetry/api@1.9.0))':
+  '@opencode/plugin@2.0.30(@opentelemetry/semantic-conventions@1.43.0)(redis@6.2.1(@opentelemetry/api@1.9.0))':
     dependencies:
       '@ai-sdk/provider': 3.0.8
-      '@opencode/ai': 2.0.29
-      '@opencode/client': 2.0.29(effect@4.0.1)
-      '@opencode/protocol': 2.0.29
-      '@opencode/schema': 2.0.29
-      '@opencode/util': 2.0.29(@opentelemetry/semantic-conventions@1.43.0)(redis@6.2.1(@opentelemetry/api@1.9.0))
+      '@opencode/ai': 2.0.30
+      '@opencode/client': 2.0.30(effect@4.0.1)
+      '@opencode/protocol': 2.0.30
+      '@opencode/schema': 2.0.30
+      '@opencode/util': 2.0.30(@opentelemetry/semantic-conventions@1.43.0)(redis@6.2.1(@opentelemetry/api@1.9.0))
       effect: 4.0.1
     transitivePeerDependencies:
       - '@opentelemetry/sdk-trace-web'
@@ -3141,17 +3141,17 @@ snapshots:
       - supports-color
       - utf-8-validate
 
-  '@opencode/protocol@2.0.29':
+  '@opencode/protocol@2.0.30':
     dependencies:
-      '@opencode/schema': 2.0.29
+      '@opencode/schema': 2.0.30
       effect: 4.0.1
 
-  '@opencode/schema@2.0.29':
+  '@opencode/schema@2.0.30':
     dependencies:
       '@standard-schema/spec': 1.1.0
       effect: 4.0.1
 
-  '@opencode/util@2.0.29(@opentelemetry/semantic-conventions@1.43.0)(redis@6.2.1(@opentelemetry/api@1.9.0))':
+  '@opencode/util@2.0.30(@opentelemetry/semantic-conventions@1.43.0)(redis@6.2.1(@opentelemetry/api@1.9.0))':
     dependencies:
       '@effect/opentelemetry': 4.0.1(@opentelemetry/api-logs@0.219.0)(@opentelemetry/api@1.9.0)(@opentelemetry/resources@2.8.0(@opentelemetry/api@1.9.0))(@opentelemetry/sdk-logs@0.219.0(@opentelemetry/api@1.9.0))(@opentelemetry/sdk-metrics@2.8.0(@opentelemetry/api@1.9.0))(@opentelemetry/sdk-trace-base@2.8.0(@opentelemetry/api@1.9.0))(@opentelemetry/sdk-trace-node@2.8.0(@opentelemetry/api@1.9.0))(@opentelemetry/semantic-conventions@1.43.0)(effect@4.0.1)
       '@effect/platform-node': 4.0.1(effect@4.0.1)(redis@6.2.1(@opentelemetry/api@1.9.0))
