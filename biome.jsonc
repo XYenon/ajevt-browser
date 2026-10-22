@@ -7,7 +7,7 @@
   },
   "files": {
     "ignoreUnknown": true,
-    "includes": ["**", "!**/*.tgz"]
+    "includes": ["**", "!**/*.tgz", "!**/pnpm-lock.yaml", "!**/pnpm-workspace.yaml"]
   },
   "formatter": {
     "enabled": true,
@@ -43,6 +43,11 @@
     "formatter": {
       "enabled": true,
       "trailingCommas": "none"
+    }
+  },
+  "markdown": {
+    "formatter": {
+      "enabled": false
     }
   },
   "assist": {

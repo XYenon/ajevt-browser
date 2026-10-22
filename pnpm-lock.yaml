@@ -12,7 +12,7 @@ importers:
         specifier: 0.0.0-20261021001728-gcc084cc
         version: 0.0.0-20261021001728-gcc084cc
       '@biomejs/biome':
-        specifier: ^2.5.14
+        specifier: ^2.6.2
         version: 2.6.2
       '@earendil-works/pi-coding-agent':
         specifier: ^1.0.0
