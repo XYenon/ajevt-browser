@@ -22,7 +22,7 @@ importers:
         version: 1.4.0
       '@opencode/plugin':
         specifier: ^2.0.14
-        version: 2.2.2(@opentelemetry/semantic-conventions@1.43.0)(redis@6.2.1(@opentelemetry/api@1.9.0))
+        version: 2.2.3(@opentelemetry/semantic-conventions@1.43.0)(redis@6.2.1(@opentelemetry/api@1.9.0))
       '@types/node':
         specifier: ^26.0.0
         version: 26.6.6
@@ -613,11 +613,11 @@ packages:
     resolution: {integrity: sha512-mGUWr1uMnf0le2TwfOZY4SFxZGXGfm4Jtay/nwAa2FLNAKXUoUwaGwBMNH36UHPtinWfTSJ3nqFQr0091CxVGg==}
     engines: {node: ^20.17.0 || >=22.9.0}
 
-  '@opencode/ai@2.2.2':
-    resolution: {integrity: sha512-6/7uJLQ/qFIwN9om1oNP9TP1wcKEaRoJd/ALjuKvrt7R9Mc/W0Er4Ykc4eOzG4+m5r6xd3B5HvrNS2qluuutDQ==}
+  '@opencode/ai@2.2.3':
+    resolution: {integrity: sha512-fUMZmeRCK/lqjKtYlWu+3JvQ46U7x3kNwgyhB1wfR0GhXRX5KeXf/vfYupjS4IkOHWay/zBTP1ZUsRDmOGmlOA==}
 
-  '@opencode/client@2.2.2':
-    resolution: {integrity: sha512-g98UZXcnLWg74t6eH284DmIqgIYX4JE4oWq2diepZK63/HV0GrnIXSxXKITw0CLvGlN5m7S+LIawuY1kOK8M8g==}
+  '@opencode/client@2.2.3':
+    resolution: {integrity: sha512-ph1uIGrQl1bO6jZ9RCVfa/aBsz0nCq3pnpikExQ0W8oKUwS9mH5tQfpwG0e85V6W4KPeOQCwGUWB0WTzXnYO/Q==}
     peerDependencies:
       effect: 4.0.6
       solid-js: '>=1.9.0'
@@ -627,12 +627,12 @@ packages:
       solid-js:
         optional: true
 
-  '@opencode/plugin@2.2.2':
-    resolution: {integrity: sha512-IOHEb7HUJc3KW3Gg+BxbF2sQuV3pCcIRTMaXvLhtQoH6R0kuswDO2xJgrLilvZ0WbBxrx6uxiZVja7pNPxRK8Q==}
+  '@opencode/plugin@2.2.3':
+    resolution: {integrity: sha512-JK8FW4VHPHkQKgKi9m7kKdx9L1CRSNYpxNR1DtXC9SAe7f8huWoXEN+LH2vv38KEanOfY5OdcUhBUHKAwidyeg==}
     peerDependencies:
-      '@opencode/theme': 2.2.2
-      '@opentui/core': 0.7.0
-      '@opentui/solid': 0.7.0
+      '@opencode/theme': 2.2.3
+      '@opentui/core': '>=0.8.0'
+      '@opentui/solid': '>=0.8.0'
       electron: '*'
       solid-js: '>=1.9.0'
       vite: '>=6'
@@ -653,14 +653,14 @@ packages:
       vite-plugin-solid:
         optional: true
 
-  '@opencode/protocol@2.2.2':
-    resolution: {integrity: sha512-wph91QN2LygnzxdI9IRyVh/vVBinibXW/jhcwjtbTYBv+PA52jPCloyMSPdusb/R7wjscATDVKviYaPornR37A==}
+  '@opencode/protocol@2.2.3':
+    resolution: {integrity: sha512-4SBCchbfwMb2AK27vH+Qlwrnnbzw4tMT7LsFJRNwO/H7LPKbsMJJsAlRYjcyxQYEPDNYVXyFCF1rCkrA3OeCJg==}
 
-  '@opencode/schema@2.2.2':
-    resolution: {integrity: sha512-HgUtQ7sY3E1ns00sIYjdEdGQNw7aGDm7BOJwLiKnoYChDItrglby1XvjE7U/fzOliq6HYgxliXH+lmxQquSf1A==}
+  '@opencode/schema@2.2.3':
+    resolution: {integrity: sha512-5Lm6Aw6E3nHigLJcSOteontUKv/9fzjfEXaBvaIHAageNvq0hYBgWSBv0ZikaAj1pJr5e1y9TSW6cbWqQcjMjg==}
 
-  '@opencode/util@2.2.2':
-    resolution: {integrity: sha512-Ge5P9QoR3s+GNVsy8oTrHUBJ32ISxqx/3U6cQ32okwqbw+HeBgcJ5btf8diRhw4BH9pEepEqqhhROa1R+Mhkgw==}
+  '@opencode/util@2.2.3':
+    resolution: {integrity: sha512-Xp9hb909LaYJ667Yzg5LkCBrj9h44umOiH9WF7Mj4ZZlOKQDr5H3a3LEw0r7a8ED8yfnXMrN8xFMeL6EojBmGQ==}
 
   '@opentelemetry/api-logs@0.219.0':
     resolution: {integrity: sha512-FFx7YnaYJlIjqWW/AG/yAZ0L/NEY724PipXXXQLdtZPbLwBGbUMTGL1i/esI56TWfTUXxhLfpgrnWJCG8aUJyg==}
@@ -837,6 +837,7 @@ packages:
   '@smithy/core@3.34.1':
     resolution: {integrity: sha512-dLcOUxz8YCv1RZUMKq6GbyUf95pLbrqh34bPvpCZ1+CByFF31BEAFewZjsGCnVsZTKdThNENfGyAgk2TJqVwSw==}
     engines: {node: '>=18.0.0'}
+    deprecated: Deprecated due to a bug in custom logger data redaction. See https://github.com/aws/aws-sdk-js-v3/issues/8393.
 
   '@smithy/credential-provider-imds@4.5.2':
     resolution: {integrity: sha512-A9uSdn72ozbRUSit0eib0TW7nXuNPlaeM0zcGkJ+nE6tFcSDbnmtwoxbTCFBukVQcszDAyvsd7+rTduPTXpygg==}
@@ -3158,10 +3159,10 @@ snapshots:
       node-gyp: 12.4.0
       proc-log: 6.1.0
 
-  '@opencode/ai@2.2.2':
+  '@opencode/ai@2.2.3':
     dependencies:
       '@aws-sdk/credential-providers': 3.1057.0
-      '@opencode/schema': 2.2.2
+      '@opencode/schema': 2.2.3
       '@smithy/eventstream-codec': 4.2.14
       '@smithy/util-utf8': 4.2.2
       aws4fetch: 1.0.20
@@ -3170,21 +3171,21 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  '@opencode/client@2.2.2(effect@4.0.6)':
+  '@opencode/client@2.2.3(effect@4.0.6)':
     dependencies:
-      '@opencode/protocol': 2.2.2
-      '@opencode/schema': 2.2.2
+      '@opencode/protocol': 2.2.3
+      '@opencode/schema': 2.2.3
     optionalDependencies:
       effect: 4.0.6
 
-  '@opencode/plugin@2.2.2(@opentelemetry/semantic-conventions@1.43.0)(redis@6.2.1(@opentelemetry/api@1.9.0))':
+  '@opencode/plugin@2.2.3(@opentelemetry/semantic-conventions@1.43.0)(redis@6.2.1(@opentelemetry/api@1.9.0))':
     dependencies:
       '@ai-sdk/provider': 3.0.8
-      '@opencode/ai': 2.2.2
-      '@opencode/client': 2.2.2(effect@4.0.6)
-      '@opencode/protocol': 2.2.2
-      '@opencode/schema': 2.2.2
-      '@opencode/util': 2.2.2(@opentelemetry/semantic-conventions@1.43.0)(redis@6.2.1(@opentelemetry/api@1.9.0))
+      '@opencode/ai': 2.2.3
+      '@opencode/client': 2.2.3(effect@4.0.6)
+      '@opencode/protocol': 2.2.3
+      '@opencode/schema': 2.2.3
+      '@opencode/util': 2.2.3(@opentelemetry/semantic-conventions@1.43.0)(redis@6.2.1(@opentelemetry/api@1.9.0))
       effect: 4.0.6
     transitivePeerDependencies:
       - '@opentelemetry/sdk-trace-web'
@@ -3194,17 +3195,17 @@ snapshots:
       - supports-color
       - utf-8-validate
 
-  '@opencode/protocol@2.2.2':
+  '@opencode/protocol@2.2.3':
     dependencies:
-      '@opencode/schema': 2.2.2
+      '@opencode/schema': 2.2.3
       effect: 4.0.6
 
-  '@opencode/schema@2.2.2':
+  '@opencode/schema@2.2.3':
     dependencies:
       '@standard-schema/spec': 1.1.0
       effect: 4.0.6
 
-  '@opencode/util@2.2.2(@opentelemetry/semantic-conventions@1.43.0)(redis@6.2.1(@opentelemetry/api@1.9.0))':
+  '@opencode/util@2.2.3(@opentelemetry/semantic-conventions@1.43.0)(redis@6.2.1(@opentelemetry/api@1.9.0))':
     dependencies:
       '@effect/opentelemetry': 4.0.6(@opentelemetry/api-logs@0.219.0)(@opentelemetry/api@1.9.0)(@opentelemetry/resources@2.8.0(@opentelemetry/api@1.9.0))(@opentelemetry/sdk-logs@0.219.0(@opentelemetry/api@1.9.0))(@opentelemetry/sdk-metrics@2.8.0(@opentelemetry/api@1.9.0))(@opentelemetry/sdk-trace-base@2.8.0(@opentelemetry/api@1.9.0))(@opentelemetry/sdk-trace-node@2.8.0(@opentelemetry/api@1.9.0))(@opentelemetry/semantic-conventions@1.43.0)(effect@4.0.6)
       '@effect/platform-node': 4.0.6(effect@4.0.6)(redis@6.2.1(@opentelemetry/api@1.9.0))
