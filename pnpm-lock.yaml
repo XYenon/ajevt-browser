@@ -9,8 +9,8 @@ importers:
   .:
     devDependencies:
       '@ampcode/plugin':
-        specifier: 0.0.0-20261029001459-g185813a
-        version: 0.0.0-20261029001459-g185813a
+        specifier: 0.0.0-20261030001330-g694fa8a
+        version: 0.0.0-20261030001330-g694fa8a
       '@biomejs/biome':
         specifier: ^2.6.2
         version: 2.6.4
@@ -70,8 +70,8 @@ packages:
     resolution: {integrity: sha512-oGMAgGoQdBXbZqNG0Ze56CHjDZ1IDYOwGYxYjO5KLSlz5HiNQ9udIXsPZ61VWaHGZ5XW/jyjmr6t2xz2jGVwbQ==}
     engines: {node: '>=18'}
 
-  '@ampcode/plugin@0.0.0-20261029001459-g185813a':
-    resolution: {integrity: sha512-ItK9Gey8qcEfXN5UVCCWGj9eZ173Jvbki3iBv1F9VhOfA+Addl1octRt7UhHiF/E2Gb2nhTbUnOsdxwz93nf8w==}
+  '@ampcode/plugin@0.0.0-20261030001330-g694fa8a':
+    resolution: {integrity: sha512-24XZEZbVnn3SCviCLfAgBsy0hi2Q4es6bWxLECbcPcQzJrn/GzfIYMlpFngy0YDJQ1evN96tIPcZVwkPNUt0nA==}
 
   '@anthropic-ai/sdk@0.129.0':
     resolution: {integrity: sha512-MH7LB20kNpGLUpPTe2OG5XvL/KhX8HUO9XyBaFjgFk6TLS4Xjt0VPIuMKywe7POKKPslX+QxSlVok9e+8kG5Nw==}
@@ -2445,7 +2445,7 @@ snapshots:
     dependencies:
       json-schema: 0.4.0
 
-  '@ampcode/plugin@0.0.0-20261029001459-g185813a': {}
+  '@ampcode/plugin@0.0.0-20261030001330-g694fa8a': {}
 
   '@anthropic-ai/sdk@0.129.0(zod@4.1.8)':
     dependencies:
