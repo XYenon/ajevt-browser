@@ -45,11 +45,6 @@
       "trailingCommas": "none"
     }
   },
-  "markdown": {
-    "formatter": {
-      "enabled": false
-    }
-  },
   "assist": {
     "enabled": true,
     "actions": {

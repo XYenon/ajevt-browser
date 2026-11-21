@@ -49,7 +49,7 @@ Add the package to `opencode.jsonc`. The package root exports the plugin:
 ```jsonc
 {
   "$schema": "https://opencode.ai/config.json",
-  "plugins": ["ajevt-browser"],
+  "plugins": ["ajevt-browser"]
 }
 ```
 
@@ -185,9 +185,9 @@ OpenCode `plugins[].options` can apply the highest-priority override using the s
   "plugins": [
     {
       "package": "ajevt-browser",
-      "options": { "decision": { "model": "jev-latest", "timeoutMs": 3000 } },
-    },
-  ],
+      "options": { "decision": { "model": "jev-latest", "timeoutMs": 3000 } }
+    }
+  ]
 }
 ```
 
